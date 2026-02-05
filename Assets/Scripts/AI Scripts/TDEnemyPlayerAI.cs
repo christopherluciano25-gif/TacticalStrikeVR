@@ -32,23 +32,54 @@ public class TDEnemyPlayerAI : MonoBehaviour
 
     private void DisplayBoard()
     {
+        if (gridSystem == null)
+        {
+            Debug.LogError("GridSystem not assigned");
+            return;
+        }
+        if (archerTowerBlockPrefab == null)
+        {
+            Debug.LogError("Archer Tower Block Prefab not assigned");
+            return;
+        }
+        if (wallBlockPrefab == null)
+        {
+            Debug.LogError("Wall Block Prefab not assigned");
+            return;
+        }
+
         int[,] board = ai.GetAIBoard();
+        int placedCount = 0;
         for (int r = 0; r < 9; r++)
         {
             for (int c = 0; c < 9; c++)
             {
                 if (board[r, c] != 0)
                 {
-                    GridCell cell = gridSystem.Cells[c, r];
-                    if (cell.IsAvailable())
+                    if (c >= gridSystem.Columns || r >= gridSystem.Rows)
                     {
-                        GameObject prefab = board[r, c] == 1 ? archerTowerBlockPrefab : wallBlockPrefab;
-                        GameObject instance = Instantiate(prefab, cell.worldPosition, Quaternion.identity);
-                        cell.Occupy(instance);
+                        Debug.LogWarning($"Board position ({r},{c}) out of grid bounds ({gridSystem.Rows},{gridSystem.Columns})");
+                        continue;
                     }
+                    GridCell cell = gridSystem.Cells[c, r];
+                    if (cell == null)
+                    {
+                        Debug.LogError($"Cell at ({c},{r}) is null");
+                        continue;
+                    }
+                    if (!cell.IsAvailable())
+                    {
+                        Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
+                        continue;
+                    }
+                    GameObject prefab = board[r, c] == 1 ? archerTowerBlockPrefab : wallBlockPrefab;
+                    GameObject instance = Instantiate(prefab, cell.worldPosition, Quaternion.identity);
+                    cell.Occupy(instance);
+                    placedCount++;
                 }
             }
         }
+        Debug.Log($"AI placed {placedCount} blocks on the grid");
     }
 
 public class TowerDefenceAI
@@ -125,12 +156,14 @@ public class TowerDefenceAI
 
         if (choice.Row == -1)
         {
-            // No valid placement found
+            Debug.Log("AI: No valid placement found.");
             return;
         }
 
         ApplyPlacement(aiBoard, choice);
         IncrementPlacementCount(choice);
+
+        Debug.Log($"AI placed: {choice} | Towers: {totalArcherTowersPlaced}/{MAX_ARCHER_TOWERS}, Walls: {totalWallsPlaced}/{MAX_WALLS}");
     }
 
     // =========================================
