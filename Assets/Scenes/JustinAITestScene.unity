@@ -479,6 +479,56 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 239439690}
   m_Mesh: {fileID: 8733429697405204941, guid: 38b797ba6cc77df40a51cd3200365644, type: 3}
+--- !u!1 &262216601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 262216603}
+  - component: {fileID: 262216602}
+  m_Layer: 0
+  m_Name: EnemyAI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &262216602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262216601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba952de25ebcb949a88ee5501011557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridSystem: {fileID: 817294122}
+  archerTowerBlockPrefab: {fileID: 243576314755429017, guid: f7b398ae8036d3b4889493f6149ad6c2,
+    type: 3}
+  wallBlockPrefab: {fileID: 8492480031058933265, guid: b984d29056062eb42a6ffef7a7e11ca6,
+    type: 3}
+  runOnStart: 1
+--- !u!4 &262216603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262216601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -88.31097, y: -23.596571, z: 126.47998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &263489439
 GameObject:
   m_ObjectHideFlags: 0
@@ -1889,6 +1939,8 @@ GameObject:
   m_Component:
   - component: {fileID: 817294121}
   - component: {fileID: 817294122}
+  - component: {fileID: 817294124}
+  - component: {fileID: 817294123}
   m_Layer: 0
   m_Name: GridSystem
   m_TagString: Untagged
@@ -1896,21 +1948,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &817294121
-Transform:
+--- !u!224 &817294121
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 817294119}
-  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 94.17426, y: -32.528835, z: -8.191297}
+  m_LocalPosition: {x: 0, y: 0, z: -8.191297}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1122469401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 94.17426, y: -32.528835}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &817294122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1944,6 +2000,44 @@ MonoBehaviour:
   hoveredColor: {r: 0, g: 0.5, b: 1, a: 0.5}
   showDebugInfo: 1
   showCellCoordinates: 0
+--- !u!114 &817294123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817294119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6969d020cb6a35c469ecf5c9bdd8b764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleAxis: 0
+  minSpacing: {x: 0, y: 0}
+--- !u!114 &817294124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817294119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1 &848772610
 GameObject:
   m_ObjectHideFlags: 0
@@ -5393,3 +5487,4 @@ SceneRoots:
   - {fileID: 1515071173}
   - {fileID: 1122469401}
   - {fileID: 1642012418}
+  - {fileID: 262216603}
