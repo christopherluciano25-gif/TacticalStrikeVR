@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{B9E90087-68D5-E090-0802-2B8D5757B60F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.Interaction.Toolkit.Samples.StarterAssets", "Unity.XR.Interaction.Toolkit.Samples.StarterAssets.csproj", "{9FBC918C-43EC-2B24-8B6F-EBAAE2EBE387}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.XR.Interaction.Toolkit.Samples.StarterAssets.Editor", "Unity.XR.Interaction.Toolkit.Samples.StarterAssets.Editor.csproj", "{1B2DE5BD-4F69-C993-B5EB-FEAA7B888817}"
 EndProject
@@ -15,18 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9E90087-68D5-E090-0802-2B8D5757B60F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9E90087-68D5-E090-0802-2B8D5757B60F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9E90087-68D5-E090-0802-2B8D5757B60F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9E90087-68D5-E090-0802-2B8D5757B60F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9FBC918C-43EC-2B24-8B6F-EBAAE2EBE387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FBC918C-43EC-2B24-8B6F-EBAAE2EBE387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FBC918C-43EC-2B24-8B6F-EBAAE2EBE387}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FBC918C-43EC-2B24-8B6F-EBAAE2EBE387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{804B1EE6-6D5A-32E7-F0B9-D61CD53A55C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B2DE5BD-4F69-C993-B5EB-FEAA7B888817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B2DE5BD-4F69-C993-B5EB-FEAA7B888817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B2DE5BD-4F69-C993-B5EB-FEAA7B888817}.Release|Any CPU.ActiveCfg = Release|Any CPU
