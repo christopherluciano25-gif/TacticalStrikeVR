@@ -49,12 +49,57 @@ public class TDEnemyPlayerAI : MonoBehaviour
         }
 
         int[,] board = ai.GetAIBoard();
+        bool[,] processed = new bool[9, 9];  // Track processed cells to avoid double-placing towers
         int placedCount = 0;
+        
         for (int r = 0; r < 9; r++)
         {
             for (int c = 0; c < 9; c++)
             {
-                if (board[r, c] != 0)
+                if (board[r, c] == 0 || processed[r, c])
+                    continue;
+
+                // Handle archer towers (only place at top-left corner of 2x2)
+                if (board[r, c] == 1)
+                {
+                    // Check if this is the top-left corner of a complete 2x2 tower
+                    if (r + 1 < 9 && c + 1 < 9 && 
+                        board[r, c] == 1 && board[r, c+1] == 1 && 
+                        board[r+1, c] == 1 && board[r+1, c+1] == 1)
+                    {
+                        // Only instantiate at the top-left corner
+                        if (c >= gridSystem.Columns || r >= gridSystem.Rows)
+                        {
+                            Debug.LogWarning($"Board position ({r},{c}) out of grid bounds ({gridSystem.Rows},{gridSystem.Columns})");
+                            continue;
+                        }
+                        GridCell cell = gridSystem.Cells[c, r];
+                        if (cell == null)
+                        {
+                            Debug.LogError($"Cell at ({c},{r}) is null");
+                            continue;
+                        }
+                        if (!cell.IsAvailable())
+                        {
+                            Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
+                            continue;
+                        }
+                        
+                        GameObject instance = Instantiate(archerTowerBlockPrefab, cell.worldPosition, Quaternion.identity);
+                        cell.Occupy(instance);
+                        placedCount++;
+                        
+                        // Mark all 4 cells as processed
+                        processed[r, c] = true;
+                        processed[r, c+1] = true;
+                        processed[r+1, c] = true;
+                        processed[r+1, c+1] = true;
+                    }
+                    continue;
+                }
+
+                // Handle walls (place one per cell)
+                if (board[r, c] == 2)
                 {
                     if (c >= gridSystem.Columns || r >= gridSystem.Rows)
                     {
@@ -72,10 +117,11 @@ public class TDEnemyPlayerAI : MonoBehaviour
                         Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
                         continue;
                     }
-                    GameObject prefab = board[r, c] == 1 ? archerTowerBlockPrefab : wallBlockPrefab;
-                    GameObject instance = Instantiate(prefab, cell.worldPosition, Quaternion.identity);
+                    
+                    GameObject instance = Instantiate(wallBlockPrefab, cell.worldPosition, Quaternion.identity);
                     cell.Occupy(instance);
                     placedCount++;
+                    processed[r, c] = true;
                 }
             }
         }
@@ -152,18 +198,22 @@ public class TowerDefenceAI
         var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
         var goal = (r: goalRow, c: 0);
 
-        Placement choice = ChooseNextPlacementLCV(spawn, goal);
-
-        if (choice.Row == -1)
+        // Place all towers and walls in a single turn
+        while (totalArcherTowersPlaced < MAX_ARCHER_TOWERS || totalWallsPlaced < MAX_WALLS)
         {
-            Debug.Log("AI: No valid placement found.");
-            return;
+            Placement choice = ChooseNextPlacementLCV(spawn, goal);
+
+            if (choice.Row == -1)
+            {
+                Debug.Log("AI: No valid placement found.");
+                break;
+            }
+
+            ApplyPlacement(aiBoard, choice);
+            IncrementPlacementCount(choice);
+
+            Debug.Log($"AI placed: {choice} | Towers: {totalArcherTowersPlaced}/{MAX_ARCHER_TOWERS}, Walls: {totalWallsPlaced}/{MAX_WALLS}");
         }
-
-        ApplyPlacement(aiBoard, choice);
-        IncrementPlacementCount(choice);
-
-        Debug.Log($"AI placed: {choice} | Towers: {totalArcherTowersPlaced}/{MAX_ARCHER_TOWERS}, Walls: {totalWallsPlaced}/{MAX_WALLS}");
     }
 
     // =========================================
@@ -185,6 +235,12 @@ public class TowerDefenceAI
         // Baseline: how constrained is the current board?
         int baseFutureCount = CountFutureOptions(aiBoard);
 
+        // Baseline: how many independent right-edge -> left-edge paths exist (fewer is better)
+        int baseSpawnPaths = CountSpawnPaths(aiBoard);
+
+        // Baseline: how many tower cells are reachable from the right edge (fewer => better protected)
+        int baseTowerReach = CountTowerReachableFromRight(aiBoard);
+
         // Baseline path length (for wall detour benefit)
         var basePath = FindShortestPath(aiBoard, enemySpawn, baseGoal);
         int baseLen = basePath?.Count ?? 9999;
@@ -204,24 +260,54 @@ public class TowerDefenceAI
             int futureCount = CountFutureOptions(trial);
             int constraintCost = baseFutureCount - futureCount; // lower is better
 
+            // How many spawn paths remain after this placement
+            int newSpawnPaths = CountSpawnPaths(trial);
+            int spawnPathReduction = baseSpawnPaths - newSpawnPaths;
+
+            // How many tower cells are reachable from the right after this placement
+            int newTowerReach = CountTowerReachableFromRight(trial);
+            int towerReachReduction = baseTowerReach - newTowerReach;
+
             // Benefit scoring
             int benefit = 0;
 
-            if (cand.Type == PlacementType.WallH || cand.Type == PlacementType.WallV)
-            {
-                // Reward LCV: how many options are left after this move
-                benefit = futureCount * 5;
-            }
             if (cand.Type == PlacementType.ArcherTower)
             {
-                // Reward shooting coverage: how much of the path is in range 3
-                benefit = CountPathTilesCoveredByTower(path, cand.Row, cand.Col, range: 3) * 10;
+                // Reward tower placement: attract enemies by blocking their path
+                int pathTilesCovered = CountPathTilesCoveredByTower(path, cand.Row, cand.Col, range: 3);
+                benefit = pathTilesCovered * 15;
+
+                // Bonus: towers closer to the goal are more valuable
+                int distToGoal = Math.Min(Math.Abs(cand.Row - baseGoal.r), Math.Abs(cand.Col - baseGoal.c));
+                benefit += Math.Max(0, (5 - distToGoal) * 5);
             }
             else
             {
-                // Reward detours: longer path is better (but only if path still exists)
+                // Wall placement: prefer walls that actually affect enemy movement
+
+                // Use the trial board (with the wall placed) when evaluating adjacency
+                int adjacentTowers = CountAdjacentTowers(trial, cand.Row, cand.Col, cand.Type);
+
+                // How much does this wall increase path length (detour benefit)?
                 int newLen = path.Count;
-                benefit = Math.Max(0, newLen - baseLen) * 8;
+                int detourBenefit = Math.Max(0, newLen - baseLen) * 12;
+
+                // How many path tiles does the wall overlap (or sit on)?
+                int pathOverlap = 0;
+                var pathSet = new HashSet<(int r, int c)>(path);
+                if (cand.Type == PlacementType.WallH)
+                {
+                    for (int cc = cand.Col; cc < cand.Col + WALL_LEN; cc++)
+                        if (pathSet.Contains((cand.Row, cc))) pathOverlap++;
+                }
+                else
+                {
+                    for (int rr = cand.Row; rr < cand.Row + WALL_LEN; rr++)
+                        if (pathSet.Contains((rr, cand.Col))) pathOverlap++;
+                }
+
+                // Combine heuristics: protect towers, overlap path, and increase detour
+                benefit = adjacentTowers * 18 + pathOverlap * 30 + detourBenefit + futureCount * 2;
             }
 
             int totalScore = benefit - (constraintCost * 3);
@@ -328,10 +414,10 @@ public class TowerDefenceAI
         bool InBounds(int r, int c) => r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
 
         // Movement rule:
-        // - walls block movement
-        // - towers do NOT block movement (typical tower defense)
-        // If you want towers to block too, change to: board[r,c] == 0
-        bool Walkable(int r, int c) => board[r, c] != 2;
+        // - walls block movement (value 2)
+        // - towers block movement (value 1) - enemies must navigate around them
+        // - only empty cells are walkable
+        bool Walkable(int r, int c) => board[r, c] == 0;
 
         if (!InBounds(start.r, start.c) || !InBounds(goal.r, goal.c)) return null;
         if (!Walkable(start.r, start.c) || !Walkable(goal.r, goal.c)) return null;
@@ -377,6 +463,41 @@ public class TowerDefenceAI
     }
 
     // =========================================
+    // Count adjacent towers (for wall protection scoring)
+    // =========================================
+    private int CountAdjacentTowers(int[,] board, int wallRow, int wallCol, PlacementType wallType)
+    {
+        int count = 0;
+        var adjacentCells = new List<(int r, int c)>();
+        
+        if (wallType == PlacementType.WallH)
+        {
+            // Horizontal wall: check cells above and below
+            for (int c = wallCol; c < wallCol + WALL_LEN; c++)
+            {
+                if (wallRow > 0) adjacentCells.Add((wallRow - 1, c));
+                if (wallRow < BOARD_SIZE - 1) adjacentCells.Add((wallRow + 1, c));
+            }
+        }
+        else
+        {
+            // Vertical wall: check cells left and right
+            for (int r = wallRow; r < wallRow + WALL_LEN; r++)
+            {
+                if (wallCol > 0) adjacentCells.Add((r, wallCol - 1));
+                if (wallCol < BOARD_SIZE - 1) adjacentCells.Add((r, wallCol + 1));
+            }
+        }
+        
+        foreach (var (r, c) in adjacentCells)
+        {
+            if (board[r, c] == 1) count++;
+        }
+        
+        return count;
+    }
+
+    // =========================================
     // Tower range benefit (range=3)
     // Chebyshev distance around 2x2 footprint
     // =========================================
@@ -399,6 +520,53 @@ public class TowerDefenceAI
         }
 
         return covered;
+    }
+
+    // =========================================
+    // Count how many distinct right-edge spawn rows have a path to the left edge
+    // Fewer such paths means fewer ways for enemies to reach the left (good)
+    // =========================================
+    private int CountSpawnPaths(int[,] board)
+    {
+        int count = 0;
+        for (int r = 0; r < BOARD_SIZE; r++)
+        {
+            var start = (r, BOARD_SIZE - 1);
+            bool found = false;
+            for (int targetRow = 0; targetRow < BOARD_SIZE; targetRow++)
+            {
+                var goal = (targetRow, 0);
+                if (FindShortestPath(board, start, goal) != null)
+                {
+                    found = true; break;
+                }
+            }
+            if (found) count++;
+        }
+        return count;
+    }
+
+    // =========================================
+    // Count how many tower cells (any 1s) are reachable from any right-edge spawn
+    // Lower is better (walls protecting towers)
+    // =========================================
+    private int CountTowerReachableFromRight(int[,] board)
+    {
+        var reachable = new HashSet<(int r, int c)>();
+
+        for (int r = 0; r < BOARD_SIZE; r++)
+        {
+            var start = (r, BOARD_SIZE - 1);
+            for (int tr = 0; tr < BOARD_SIZE; tr++)
+                for (int tc = 0; tc < BOARD_SIZE; tc++)
+                {
+                    if (board[tr, tc] != 1) continue;
+                    if (FindShortestPath(board, start, (tr, tc)) != null)
+                        reachable.Add((tr, tc));
+                }
+        }
+
+        return reachable.Count;
     }
 
     // =========================================
