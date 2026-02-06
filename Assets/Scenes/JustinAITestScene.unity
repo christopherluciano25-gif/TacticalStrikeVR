@@ -511,7 +511,7 @@ MonoBehaviour:
   gridSystem: {fileID: 817294122}
   archerTowerBlockPrefab: {fileID: 243576314755429017, guid: f7b398ae8036d3b4889493f6149ad6c2,
     type: 3}
-  wallBlockPrefab: {fileID: 8492480031058933265, guid: b984d29056062eb42a6ffef7a7e11ca6,
+  wallBlockPrefab: {fileID: 215164798965903106, guid: 08a1c14a984751b4e992a4afa3974807,
     type: 3}
   runOnStart: 1
 --- !u!4 &262216603
