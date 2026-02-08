@@ -363,10 +363,14 @@ public class TowerDefenceAI
 
         Shuffle(candidates);
 
-        int baseLanes = CountViableLanes(aiBoard); // LCV term: minimize viable lanes
+        // True LCV core: base number of future legal placements (we prefer candidates
+        // that leave MORE future options = least constraining value). Keep the
+        // corridor strategy by using viable lane count as a secondary objective.
+        int baseFutureOptions = CountFutureOptions(aiBoard);
+        int baseLanes = CountViableLanes(aiBoard);
 
-        // Collect (candidate, laneCount, benefit)
-        var scored = new List<(Placement cand, int laneCount, int benefit)>();
+        // Collect (candidate, futureOptions, laneCount, benefit)
+        var scored = new List<(Placement cand, int futureOptions, int laneCount, int benefit)>();
 
         foreach (var cand in candidates)
         {
@@ -374,7 +378,8 @@ public class TowerDefenceAI
             if (!ApplyPlacement(trial, cand))
                 continue;
 
-            int laneCount = CountViableLanes(trial); // LCV: how many lanes remain?
+            int laneCount = CountViableLanes(trial); // Corridor metric: how many lanes remain?
+            int futureOptions = CountFutureOptions(trial); // True LCV metric
 
             // Compute benefit heuristic
             int benefit = 0;
@@ -472,16 +477,20 @@ public class TowerDefenceAI
                 }
             }
 
-            scored.Add((cand, laneCount, benefit));
+            scored.Add((cand, futureOptions, laneCount, benefit));
         }
 
         if (scored.Count == 0)
             return new Placement(PlacementType.WallH, -1, -1);
 
-        // Lexicographic: PRIMARY = laneCount (minimize), SECONDARY = benefit (maximize)
+        // Lexicographic: PRIMARY = futureOptions (maximize = least constraining),
+        // SECONDARY = laneCount (minimize to keep corridor strategy),
+        // TERTIARY = benefit (maximize)
         scored.Sort((a, b) =>
         {
-            int cmp = a.laneCount.CompareTo(b.laneCount); // prefer FEWER lanes
+            int cmp = b.futureOptions.CompareTo(a.futureOptions); // prefer MORE future options
+            if (cmp != 0) return cmp;
+            cmp = a.laneCount.CompareTo(b.laneCount); // prefer FEWER lanes
             if (cmp != 0) return cmp;
             return b.benefit.CompareTo(a.benefit); // tie-break: prefer higher benefit
         });
