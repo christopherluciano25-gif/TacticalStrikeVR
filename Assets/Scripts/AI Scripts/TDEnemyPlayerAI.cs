@@ -30,6 +30,31 @@ public class TDEnemyPlayerAI : MonoBehaviour
         DisplayBoard();
     }
 
+    private void OnDrawGizmos()
+    {
+        // Editor-only visualization: draw viable enemy lanes
+        if (ai == null) return;
+
+        var (viableLanes, board) = ai.GetViableLanesInfo();
+        if (viableLanes.Count == 0) return;
+
+        // Draw incoming lanes from right edge (spawn) in green
+        foreach (var laneRow in viableLanes)
+        {
+            Vector3 spawnPoint = gridSystem != null && laneRow < gridSystem.Rows 
+                ? gridSystem.Cells[gridSystem.Columns - 1, laneRow].worldPosition 
+                : Vector3.zero;
+            
+            Vector3 goalPoint = gridSystem != null && laneRow < gridSystem.Rows 
+                ? gridSystem.Cells[0, laneRow].worldPosition 
+                : new Vector3(-9, 0, 0);
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(spawnPoint, goalPoint);
+            Gizmos.DrawSphere(spawnPoint, 0.3f); // marker at spawn
+        }
+    }
+
     private void DisplayBoard()
     {
         if (gridSystem == null)
@@ -49,84 +74,100 @@ public class TDEnemyPlayerAI : MonoBehaviour
         }
 
         int[,] board = ai.GetAIBoard();
-        bool[,] processed = new bool[9, 9];  // Track processed cells to avoid double-placing towers
+        bool[,] processed = new bool[9, 9];
         int placedCount = 0;
-        
+
+        // First pass: Place archer towers (2x2 blocks with single center instance)
         for (int r = 0; r < 9; r++)
         {
             for (int c = 0; c < 9; c++)
             {
-                if (board[r, c] == 0 || processed[r, c])
-                    continue;
+                if (processed[r, c]) continue;
 
-                // Handle archer towers (only place at top-left corner of 2x2)
-                if (board[r, c] == 1)
+                // Check for 2x2 archer tower pattern
+                if (board[r, c] == 1 && r + 1 < 9 && c + 1 < 9 &&
+                    board[r, c] == 1 && board[r, c + 1] == 1 &&
+                    board[r + 1, c] == 1 && board[r + 1, c + 1] == 1)
                 {
-                    // Check if this is the top-left corner of a complete 2x2 tower
-                    if (r + 1 < 9 && c + 1 < 9 && 
-                        board[r, c] == 1 && board[r, c+1] == 1 && 
-                        board[r+1, c] == 1 && board[r+1, c+1] == 1)
-                    {
-                        // Only instantiate at the top-left corner
-                        if (c >= gridSystem.Columns || r >= gridSystem.Rows)
-                        {
-                            Debug.LogWarning($"Board position ({r},{c}) out of grid bounds ({gridSystem.Rows},{gridSystem.Columns})");
-                            continue;
-                        }
-                        GridCell cell = gridSystem.Cells[c, r];
-                        if (cell == null)
-                        {
-                            Debug.LogError($"Cell at ({c},{r}) is null");
-                            continue;
-                        }
-                        if (!cell.IsAvailable())
-                        {
-                            Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
-                            continue;
-                        }
-                        
-                        GameObject instance = Instantiate(archerTowerBlockPrefab, cell.worldPosition, Quaternion.identity);
-                        cell.Occupy(instance);
-                        placedCount++;
-                        
-                        // Mark all 4 cells as processed
-                        processed[r, c] = true;
-                        processed[r, c+1] = true;
-                        processed[r+1, c] = true;
-                        processed[r+1, c+1] = true;
-                    }
-                    continue;
-                }
+                    // Place single tower at center of 2x2 (between the 4 cells)
+                    // Center position is at (r+0.5, c+0.5) in board space
+                    // Get center cell coordinates
+                    int centerR = r;
+                    int centerC = c;
 
-                // Handle walls (place one per cell)
-                if (board[r, c] == 2)
-                {
-                    if (c >= gridSystem.Columns || r >= gridSystem.Rows)
+                    if (centerC >= gridSystem.Columns || centerR >= gridSystem.Rows)
                     {
-                        Debug.LogWarning($"Board position ({r},{c}) out of grid bounds ({gridSystem.Rows},{gridSystem.Columns})");
-                        continue;
+                        Debug.LogWarning($"Tower at ({centerR},{centerC}) out of grid bounds");
                     }
-                    GridCell cell = gridSystem.Cells[c, r];
-                    if (cell == null)
+                    else
                     {
-                        Debug.LogError($"Cell at ({c},{r}) is null");
-                        continue;
+                        GridCell cell = gridSystem.Cells[centerC, centerR];
+                        if (cell != null && cell.IsAvailable())
+                        {
+                            Vector3 towerPos = cell.worldPosition;
+                            GameObject instance = Instantiate(archerTowerBlockPrefab, towerPos, Quaternion.identity);
+                            cell.Occupy(instance);
+                            placedCount++;
+                            Debug.Log($"Placed archer tower at ({centerR},{centerC})");
+                        }
                     }
-                    if (!cell.IsAvailable())
-                    {
-                        Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
-                        continue;
-                    }
-                    
-                    GameObject instance = Instantiate(wallBlockPrefab, cell.worldPosition, Quaternion.identity);
-                    cell.Occupy(instance);
-                    placedCount++;
+
+                    // Mark all 4 cells as processed
                     processed[r, c] = true;
+                    processed[r, c + 1] = true;
+                    processed[r + 1, c] = true;
+                    processed[r + 1, c + 1] = true;
                 }
             }
         }
+
+        // Second pass: Place walls (1x4 or 4x1 blocks, cell by cell)
+        for (int r = 0; r < 9; r++)
+        {
+            for (int c = 0; c < 9; c++)
+            {
+                if (processed[r, c]) continue;
+                if (board[r, c] != 2) continue;
+
+                if (c >= gridSystem.Columns || r >= gridSystem.Rows)
+                {
+                    Debug.LogWarning($"Board position ({r},{c}) out of grid bounds ({gridSystem.Rows},{gridSystem.Columns})");
+                    continue;
+                }
+
+                GridCell cell = gridSystem.Cells[c, r];
+                if (cell == null)
+                {
+                    Debug.LogError($"Cell at ({c},{r}) is null");
+                    continue;
+                }
+                if (!cell.IsAvailable())
+                {
+                    Debug.LogWarning($"Cell at ({c},{r}) is not available for placement");
+                    continue;
+                }
+
+                // Determine wall orientation - check adjacent cells
+                bool hasHorizontalNeighbor = (c + 1 < 9 && board[r, c + 1] == 2) || (c - 1 >= 0 && board[r, c - 1] == 2);
+                bool hasVerticalNeighbor = (r + 1 < 9 && board[r + 1, c] == 2) || (r - 1 >= 0 && board[r - 1, c] == 2);
+                
+                GameObject instance = Instantiate(wallBlockPrefab, cell.worldPosition, Quaternion.identity);
+                
+                // Rotate horizontal walls 90 degrees, leave vertical walls at default rotation
+                if (hasHorizontalNeighbor && !hasVerticalNeighbor)
+                {
+                    instance.transform.rotation = Quaternion.Euler(0, 90, 0);
+                }
+                
+                cell.Occupy(instance);
+                placedCount++;
+                processed[r, c] = true;
+            }
+        }
+
         Debug.Log($"AI placed {placedCount} blocks on the grid");
     }
+}
 
 public class TowerDefenceAI
 {
@@ -141,6 +182,10 @@ public class TowerDefenceAI
 
     // Random generator
     private readonly System.Random rng = new System.Random(); //Random used to shuffle board placements
+
+    // Last predicted enemy spawn/goal (updated each turn)
+    private (int r, int c) lastPredictedSpawn = (-1, -1);
+    private (int r, int c) lastPredictedGoal = (-1, -1);
 
     // Placement Limits
     private int totalArcherTowersPlaced = 0;
@@ -175,6 +220,32 @@ public class TowerDefenceAI
 
     public int[,] GetAIBoard() => aiBoard;
 
+    // Get viable lanes for editor visualization
+    public (List<int> viableLanes, int[,] board) GetViableLanesInfo()
+    {
+        var lanes = new List<int>();
+        for (int spawnRow = 0; spawnRow < BOARD_SIZE; spawnRow++)
+        {
+            var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
+            bool canReachGoal = false;
+
+            for (int goalRow = 0; goalRow < BOARD_SIZE; goalRow++)
+            {
+                var goal = (r: goalRow, c: 0);
+                if (FindShortestPath(aiBoard, spawn, goal) != null)
+                {
+                    canReachGoal = true;
+                    break;
+                }
+            }
+
+            if (canReachGoal)
+                lanes.Add(spawnRow);
+        }
+
+        return (lanes, aiBoard);
+    }
+
     private void InitializeBoards()
     {
         for (int r = 0; r < BOARD_SIZE; r++)
@@ -186,165 +257,272 @@ public class TowerDefenceAI
     }
 
     // =========================================
-    // PUBLIC: Run one AI turn (varies per turn)
+    // PUBLIC: Run one AI turn (places all structures in prep phase)
     // =========================================
-    // To force different layouts, the enemy spawn row (east edge)
-    // and goal row (west edge) are randomized each turn (wave).
+    // =========================================
+    // PUBLIC: Run one AI turn (places all structures in prep phase)
+    // =========================================
     public void DoAITurn()
     {
-        int spawnRow = rng.Next(0, BOARD_SIZE);
-        int goalRow = rng.Next(0, BOARD_SIZE);
+        int initialLanes = CountViableLanes(aiBoard);
+        Debug.Log($"AI turn start: {initialLanes} viable enemy lanes");
 
-        var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
-        var goal = (r: goalRow, c: 0);
+        // Dummy spawn/goal for any remaining logic (no longer used for path prediction)
+        var spawn = (r: 0, c: BOARD_SIZE - 1);
+        var goal = (r: 0, c: 0);
 
-        // Place all towers and walls in a single turn
-        while (totalArcherTowersPlaced < MAX_ARCHER_TOWERS || totalWallsPlaced < MAX_WALLS)
+        // Phase 1: Prioritize wall placement to funnel enemies into 1 lane
+        while (totalWallsPlaced < MAX_WALLS)
         {
-            Placement choice = ChooseNextPlacementLCV(spawn, goal);
+            Placement choice = ChooseNextPlacementLCV(spawn, goal, p => p.Type != PlacementType.ArcherTower);
+            
+            if (choice.Row == -1) break;
 
-            if (choice.Row == -1)
+            if (!ApplyPlacement(aiBoard, choice)) break;
+
+            IncrementPlacementCount(choice);
+            int lanesNow = CountViableLanes(aiBoard);
+            Debug.Log($"  Placed wall: {choice} | Lanes now: {lanesNow}");
+        }
+
+        // Phase 2: Place towers along the remaining lane(s)
+        while (totalArcherTowersPlaced < MAX_ARCHER_TOWERS)
+        {
+            Placement choice = ChooseNextPlacementLCV(spawn, goal, p => p.Type == PlacementType.ArcherTower);
+            
+            if (choice.Row == -1) break;
+
+            if (!ApplyPlacement(aiBoard, choice)) break;
+
+            IncrementPlacementCount(choice);
+            Debug.Log($"  Placed tower: {choice}");
+        }
+
+        int finalLanes = CountViableLanes(aiBoard);
+        Debug.Log($"AI turn complete: {initialLanes} → {finalLanes} lanes | Towers: {totalArcherTowersPlaced}/{MAX_ARCHER_TOWERS}, Walls: {totalWallsPlaced}/{MAX_WALLS}");
+    }
+
+    // Find the most accessible enemy path (most paths available from right to left)
+    private ((int r, int c), (int r, int c)) FindMostLikelyEnemyPath()
+    {
+        int bestSpawnRow = 0;
+        int bestGoalRow = 0;
+        int maxPathsFromSpawn = 0;
+
+        // For each possible spawn row, count how many different goal rows are reachable
+        for (int spawnRow = 0; spawnRow < BOARD_SIZE; spawnRow++)
+        {
+            var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
+            int pathsAvailable = 0;
+
+            for (int goalRow = 0; goalRow < BOARD_SIZE; goalRow++)
             {
-                Debug.Log("AI: No valid placement found.");
-                break;
+                var goal = (r: goalRow, c: 0);
+                if (FindShortestPath(aiBoard, spawn, goal) != null)
+                    pathsAvailable++;
             }
 
-            ApplyPlacement(aiBoard, choice);
-            IncrementPlacementCount(choice);
-
-            Debug.Log($"AI placed: {choice} | Towers: {totalArcherTowersPlaced}/{MAX_ARCHER_TOWERS}, Walls: {totalWallsPlaced}/{MAX_WALLS}");
+            if (pathsAvailable > maxPathsFromSpawn)
+            {
+                maxPathsFromSpawn = pathsAvailable;
+                bestSpawnRow = spawnRow;
+            }
         }
+
+        // Find best goal row from the best spawn row
+        var bestSpawn = (r: bestSpawnRow, c: BOARD_SIZE - 1);
+        int shortestDistance = int.MaxValue;
+        for (int goalRow = 0; goalRow < BOARD_SIZE; goalRow++)
+        {
+            var goal = (r: goalRow, c: 0);
+            var path = FindShortestPath(aiBoard, bestSpawn, goal);
+            if (path != null && path.Count < shortestDistance)
+            {
+                shortestDistance = path.Count;
+                bestGoalRow = goalRow;
+            }
+        }
+
+        var bestGoal = (r: bestGoalRow, c: 0);
+        return (bestSpawn, bestGoal);
     }
 
     // =========================================
-    // LCV + usefulness + variety (works)
+    // LCV + Corridor Strategy
     // =========================================
-    public Placement ChooseNextPlacementLCV((int r, int c) enemySpawn, (int r, int c) baseGoal)
+    public Placement ChooseNextPlacementLCV(
+        (int r, int c) enemySpawn,
+        (int r, int c) baseGoal,
+        Func<Placement, bool> filter // lets you force "only towers" or "only walls"
+    )
     {
-        double epsilon = 0.25;  // 25% pick from topK (more variety)
-        int topK = 5;           // consider top 5 moves for exploration
-        int jitterRange = 3;    // breaks near-ties without overriding scoring
-
-        List<Placement> candidates = GenerateAllLegalPlacements();
+        // Only consider placements that match the requested type (tower phase vs wall phase)
+        List<Placement> candidates = GenerateAllLegalPlacements().FindAll(p => filter(p));
         if (candidates.Count == 0)
             return new Placement(PlacementType.WallH, -1, -1);
 
-        // Shuffle to avoid scan-order bias
         Shuffle(candidates);
 
-        // Baseline: how constrained is the current board?
-        int baseFutureCount = CountFutureOptions(aiBoard);
+        int baseLanes = CountViableLanes(aiBoard); // LCV term: minimize viable lanes
 
-        // Baseline: how many independent right-edge -> left-edge paths exist (fewer is better)
-        int baseSpawnPaths = CountSpawnPaths(aiBoard);
-
-        // Baseline: how many tower cells are reachable from the right edge (fewer => better protected)
-        int baseTowerReach = CountTowerReachableFromRight(aiBoard);
-
-        // Baseline path length (for wall detour benefit)
-        var basePath = FindShortestPath(aiBoard, enemySpawn, baseGoal);
-        int baseLen = basePath?.Count ?? 9999;
-
-        List<(Placement move, int score)> scored = new List<(Placement, int)>();
+        // Collect (candidate, laneCount, benefit)
+        var scored = new List<(Placement cand, int laneCount, int benefit)>();
 
         foreach (var cand in candidates)
         {
             int[,] trial = CopyBoard(aiBoard);
-            if (!ApplyPlacement(trial, cand)) continue;
+            if (!ApplyPlacement(trial, cand))
+                continue;
 
-            // Must keep a valid path: do not completely block
-            var path = FindShortestPath(trial, enemySpawn, baseGoal);
-            if (path == null) continue;
+            int laneCount = CountViableLanes(trial); // LCV: how many lanes remain?
 
-            // LCV cost: how many future options does this remove?
-            int futureCount = CountFutureOptions(trial);
-            int constraintCost = baseFutureCount - futureCount; // lower is better
-
-            // How many spawn paths remain after this placement
-            int newSpawnPaths = CountSpawnPaths(trial);
-            int spawnPathReduction = baseSpawnPaths - newSpawnPaths;
-
-            // How many tower cells are reachable from the right after this placement
-            int newTowerReach = CountTowerReachableFromRight(trial);
-            int towerReachReduction = baseTowerReach - newTowerReach;
-
-            // Benefit scoring
+            // Compute benefit heuristic
             int benefit = 0;
 
-            if (cand.Type == PlacementType.ArcherTower)
+            // Walls: bonus for reducing lanes
+            if (cand.Type == PlacementType.WallH || cand.Type == PlacementType.WallV)
             {
-                // Reward tower placement: attract enemies by blocking their path
-                int pathTilesCovered = CountPathTilesCoveredByTower(path, cand.Row, cand.Col, range: 3);
-                benefit = pathTilesCovered * 15;
+                // Enforce constraint: always leave at least 2 viable lanes open
+                if (laneCount < 2)
+                    continue;  // Skip placements that reduce lanes below 2
 
-                // Bonus: towers closer to the goal are more valuable
-                int distToGoal = Math.Min(Math.Abs(cand.Row - baseGoal.r), Math.Abs(cand.Col - baseGoal.c));
-                benefit += Math.Max(0, (5 - distToGoal) * 5);
+                int laneReduction = baseLanes - laneCount;
+                benefit = laneReduction * 100;  // strong bonus for squeezing lanes
+
+                // Bonus for being on right side (near spawn)
+                int wallMidCol = cand.Type == PlacementType.WallH ? cand.Col + WALL_LEN / 2 : cand.Col;
+                if (wallMidCol >= BOARD_SIZE / 2)
+                    benefit += 50;
             }
-            else
+            // Towers: place them to defend the remaining lane(s)
+            else if (cand.Type == PlacementType.ArcherTower)
             {
-                // Wall placement: prefer walls that actually affect enemy movement
-
-                // Use the trial board (with the wall placed) when evaluating adjacency
-                int adjacentTowers = CountAdjacentTowers(trial, cand.Row, cand.Col, cand.Type);
-
-                // How much does this wall increase path length (detour benefit)?
-                int newLen = path.Count;
-                int detourBenefit = Math.Max(0, newLen - baseLen) * 12;
-
-                // How many path tiles does the wall overlap (or sit on)?
-                int pathOverlap = 0;
-                var pathSet = new HashSet<(int r, int c)>(path);
-                if (cand.Type == PlacementType.WallH)
+                // Find ALL viable paths through the remaining lanes
+                var allPaths = new List<List<(int r, int c)>>();
+                for (int spawnRow = 0; spawnRow < BOARD_SIZE; spawnRow++)
                 {
-                    for (int cc = cand.Col; cc < cand.Col + WALL_LEN; cc++)
-                        if (pathSet.Contains((cand.Row, cc))) pathOverlap++;
+                    var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
+                    for (int goalRow = 0; goalRow < BOARD_SIZE; goalRow++)
+                    {
+                        var goal = (r: goalRow, c: 0);
+                        var p = FindShortestPath(trial, spawn, goal);
+                        if (p != null)
+                        {
+                            allPaths.Add(p);
+                            break;  // One path per spawn row is enough
+                        }
+                    }
+                }
+
+                if (allPaths.Count > 0)
+                {
+                    // Find distance to CLOSEST path
+                    int minDistToAnyPath = int.MaxValue;
+                    foreach (var path in allPaths)
+                    {
+                        int dist = FindMinDistanceToPath(path, cand.Row, cand.Col);
+                        if (dist < minDistToAnyPath)
+                            minDistToAnyPath = dist;
+                    }
+                    
+                    int distToPath = minDistToAnyPath;
+                    
+                    // PRIMARY: Distance to nearest viable path
+                    if (distToPath == 1 || distToPath == 2) benefit = 400;  // Optimal distance
+                    else if (distToPath == 0) benefit = 250;  // On path
+                    else if (distToPath == 3) benefit = 150;  // Still close
+                    else benefit = 30;                        // Far from path
+                    
+                    // SECONDARY: Path tile coverage - check coverage across ALL paths
+                    int totalTilesCovered = 0;
+                    int pathsWithCoverage = 0;
+                    foreach (var path in allPaths)
+                    {
+                        int tilesInRange = CountPathTilesCoveredByTower(path, cand.Row, cand.Col, range: 3);
+                        if (tilesInRange > 0)
+                        {
+                            pathsWithCoverage++;
+                            totalTilesCovered += tilesInRange;
+                        }
+                    }
+                    
+                    if (totalTilesCovered >= 3) benefit += 120;
+                    else if (totalTilesCovered >= 2) benefit += 60;
+                    else if (totalTilesCovered >= 1) benefit += 30;
+                    else benefit -= 100;  // Penalize towers that cover no paths
+                    
+                    // BONUS: If this tower covers a DIFFERENT path than others, reward it for diversity
+                    if (allPaths.Count > 1 && pathsWithCoverage > 0)
+                    {
+                        benefit += 150;  // Encourages multi-path defense
+                    }
+                    
+                    // If only 1 lane exists, place ALL towers along it
+                    if (laneCount == 1)
+                    {
+                        if (distToPath <= 2) benefit += 300;
+                    }
+                    
+                    // TERTIARY: Right-side bonus (encourages towers toward spawn)
+                    if (cand.Col >= BOARD_SIZE / 2) benefit += 40;
                 }
                 else
                 {
-                    for (int rr = cand.Row; rr < cand.Row + WALL_LEN; rr++)
-                        if (pathSet.Contains((rr, cand.Col))) pathOverlap++;
+                    benefit = -100;  // tower is useless if no paths remain
                 }
-
-                // Combine heuristics: protect towers, overlap path, and increase detour
-                benefit = adjacentTowers * 18 + pathOverlap * 30 + detourBenefit + futureCount * 2;
             }
 
-            int totalScore = benefit - (constraintCost * 3);
-
-            // Tiny jitter to create variety among near-equal moves
-            int totalScoreJittered = totalScore * 10 + rng.Next(-jitterRange, jitterRange + 1);
-
-            scored.Add((cand, totalScoreJittered));
+            scored.Add((cand, laneCount, benefit));
         }
 
         if (scored.Count == 0)
             return new Placement(PlacementType.WallH, -1, -1);
 
-        // Sort by score desc
-        scored.Sort((a, b) => b.score.CompareTo(a.score));
-
-        // Explore: randomly pick from the top K
-        if (rng.NextDouble() < epsilon)
+        // Lexicographic: PRIMARY = laneCount (minimize), SECONDARY = benefit (maximize)
+        scored.Sort((a, b) =>
         {
-            int k = Math.Min(topK, scored.Count);
-            return scored[rng.Next(k)].move;
+            int cmp = a.laneCount.CompareTo(b.laneCount); // prefer FEWER lanes
+            if (cmp != 0) return cmp;
+            return b.benefit.CompareTo(a.benefit); // tie-break: prefer higher benefit
+        });
+
+        // Pick from top 3 for variety
+        int topPickK = Math.Min(3, scored.Count);
+        int pickIdx = rng.Next(topPickK);
+        
+        return scored[pickIdx].cand;
+    }
+
+    // Count archer towers adjacent to a wall position
+    private int CountAdjacentArcherTowers(int[,] board, int row, int col, PlacementType wallType)
+    {
+        int count = 0;
+        
+        // Check all positions within 1-2 tiles of the wall
+        int minR = Math.Max(0, row - 2);
+        int maxR = Math.Min(BOARD_SIZE - 1, row + WALL_LEN + 1);
+        int minC = Math.Max(0, col - 2);
+        int maxC = Math.Min(BOARD_SIZE - 1, col + WALL_LEN + 1);
+
+        for (int r = minR; r <= maxR; r++)
+        {
+            for (int c = minC; c <= maxC; c++)
+            {
+                // Check for archer tower (2x2 block of 1s)
+                if (r + 1 < BOARD_SIZE && c + 1 < BOARD_SIZE &&
+                    board[r, c] == 1 && board[r, c + 1] == 1 &&
+                    board[r + 1, c] == 1 && board[r + 1, c + 1] == 1)
+                {
+                    count++;
+                }
+            }
         }
 
-        // Exploit: pick randomly among the best-score ties
-        int bestScore = scored[0].score;
-        List<Placement> bestTies = new List<Placement>();
-        for (int i = 0; i < scored.Count; i++)
-        {
-            if (scored[i].score == bestScore) bestTies.Add(scored[i].move);
-            else break;
-        }
-
-        return bestTies[rng.Next(bestTies.Count)];
+        return count;
     }
 
     // =========================================
-    // Candidate generation
+    // Candidate generation (all legal placements)
     // =========================================
     private List<Placement> GenerateAllLegalPlacements()
     {
@@ -352,32 +530,25 @@ public class TowerDefenceAI
 
         bool canPlaceMoreTowers = totalArcherTowersPlaced < MAX_ARCHER_TOWERS;
         bool canPlaceMoreWalls = totalWallsPlaced < MAX_WALLS;
-        // Towers 2x2
+
         if (canPlaceMoreTowers)
         {
             for (int r = 0; r <= BOARD_SIZE - ARCHER_TOWER_SIZE; r++)
-            {
                 for (int c = 0; c <= BOARD_SIZE - ARCHER_TOWER_SIZE; c++)
-                {
                     if (CanPlaceArcherTower(aiBoard, r, c))
                         list.Add(new Placement(PlacementType.ArcherTower, r, c));
-                }
-            }
         }
 
-        // Walls 1x4 and 4x1
         if (canPlaceMoreWalls)
         {
             for (int r = 0; r < BOARD_SIZE; r++)
-            {
                 for (int c = 0; c < BOARD_SIZE; c++)
                 {
-                    if (CanPlaceWall(aiBoard, r, c, isHorizontal: true))
+                    if (CanPlaceWall(aiBoard, r, c, true))
                         list.Add(new Placement(PlacementType.WallH, r, c));
-                    if (CanPlaceWall(aiBoard, r, c, isHorizontal: false))
+                    if (CanPlaceWall(aiBoard, r, c, false))
                         list.Add(new Placement(PlacementType.WallV, r, c));
                 }
-            }
         }
 
         return list;
@@ -390,12 +561,10 @@ public class TowerDefenceAI
     {
         int count = 0;
 
-        // Tower placements
         for (int r = 0; r <= BOARD_SIZE - ARCHER_TOWER_SIZE; r++)
             for (int c = 0; c <= BOARD_SIZE - ARCHER_TOWER_SIZE; c++)
                 if (CanPlaceArcherTower(board, r, c)) count++;
 
-        // Wall placements
         for (int r = 0; r < BOARD_SIZE; r++)
             for (int c = 0; c < BOARD_SIZE; c++)
             {
@@ -407,17 +576,42 @@ public class TowerDefenceAI
     }
 
     // =========================================
+    // Corridor LCV: count viable enemy lanes
+    // =========================================
+    private int CountViableLanes(int[,] board)
+    {
+        // Count how many spawn rows can reach at least one goal row
+        int viableLanes = 0;
+
+        for (int spawnRow = 0; spawnRow < BOARD_SIZE; spawnRow++)
+        {
+            var spawn = (r: spawnRow, c: BOARD_SIZE - 1);
+            bool canReachGoal = false;
+
+            for (int goalRow = 0; goalRow < BOARD_SIZE; goalRow++)
+            {
+                var goal = (r: goalRow, c: 0);
+                if (FindShortestPath(board, spawn, goal) != null)
+                {
+                    canReachGoal = true;
+                    break;
+                }
+            }
+
+            if (canReachGoal)
+                viableLanes++;
+        }
+
+        return viableLanes;
+    }
+
+    // =========================================
     // Pathfinding (BFS shortest path)
     // =========================================
     private List<(int r, int c)> FindShortestPath(int[,] board, (int r, int c) start, (int r, int c) goal)
     {
         bool InBounds(int r, int c) => r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
-
-        // Movement rule:
-        // - walls block movement (value 2)
-        // - towers block movement (value 1) - enemies must navigate around them
-        // - only empty cells are walkable
-        bool Walkable(int r, int c) => board[r, c] == 0;
+        bool Walkable(int r, int c) => board[r, c] != 2;  // Only walls (2) block paths, not towers (1)
 
         if (!InBounds(start.r, start.c) || !InBounds(goal.r, goal.c)) return null;
         if (!Walkable(start.r, start.c) || !Walkable(goal.r, goal.c)) return null;
@@ -463,43 +657,7 @@ public class TowerDefenceAI
     }
 
     // =========================================
-    // Count adjacent towers (for wall protection scoring)
-    // =========================================
-    private int CountAdjacentTowers(int[,] board, int wallRow, int wallCol, PlacementType wallType)
-    {
-        int count = 0;
-        var adjacentCells = new List<(int r, int c)>();
-        
-        if (wallType == PlacementType.WallH)
-        {
-            // Horizontal wall: check cells above and below
-            for (int c = wallCol; c < wallCol + WALL_LEN; c++)
-            {
-                if (wallRow > 0) adjacentCells.Add((wallRow - 1, c));
-                if (wallRow < BOARD_SIZE - 1) adjacentCells.Add((wallRow + 1, c));
-            }
-        }
-        else
-        {
-            // Vertical wall: check cells left and right
-            for (int r = wallRow; r < wallRow + WALL_LEN; r++)
-            {
-                if (wallCol > 0) adjacentCells.Add((r, wallCol - 1));
-                if (wallCol < BOARD_SIZE - 1) adjacentCells.Add((r, wallCol + 1));
-            }
-        }
-        
-        foreach (var (r, c) in adjacentCells)
-        {
-            if (board[r, c] == 1) count++;
-        }
-        
-        return count;
-    }
-
-    // =========================================
-    // Tower range benefit (range=3)
-    // Chebyshev distance around 2x2 footprint
+    // Tower range benefit
     // =========================================
     private int CountPathTilesCoveredByTower(List<(int r, int c)> path, int towerRow, int towerCol, int range)
     {
@@ -523,53 +681,6 @@ public class TowerDefenceAI
     }
 
     // =========================================
-    // Count how many distinct right-edge spawn rows have a path to the left edge
-    // Fewer such paths means fewer ways for enemies to reach the left (good)
-    // =========================================
-    private int CountSpawnPaths(int[,] board)
-    {
-        int count = 0;
-        for (int r = 0; r < BOARD_SIZE; r++)
-        {
-            var start = (r, BOARD_SIZE - 1);
-            bool found = false;
-            for (int targetRow = 0; targetRow < BOARD_SIZE; targetRow++)
-            {
-                var goal = (targetRow, 0);
-                if (FindShortestPath(board, start, goal) != null)
-                {
-                    found = true; break;
-                }
-            }
-            if (found) count++;
-        }
-        return count;
-    }
-
-    // =========================================
-    // Count how many tower cells (any 1s) are reachable from any right-edge spawn
-    // Lower is better (walls protecting towers)
-    // =========================================
-    private int CountTowerReachableFromRight(int[,] board)
-    {
-        var reachable = new HashSet<(int r, int c)>();
-
-        for (int r = 0; r < BOARD_SIZE; r++)
-        {
-            var start = (r, BOARD_SIZE - 1);
-            for (int tr = 0; tr < BOARD_SIZE; tr++)
-                for (int tc = 0; tc < BOARD_SIZE; tc++)
-                {
-                    if (board[tr, tc] != 1) continue;
-                    if (FindShortestPath(board, start, (tr, tc)) != null)
-                        reachable.Add((tr, tc));
-                }
-        }
-
-        return reachable.Count;
-    }
-
-    // =========================================
     // Placement checks / apply
     // =========================================
     private bool ApplyPlacement(int[,] board, Placement p)
@@ -577,17 +688,18 @@ public class TowerDefenceAI
         return p.Type switch
         {
             PlacementType.ArcherTower => PlaceArcherTowerOn(board, p.Row, p.Col),
-            PlacementType.WallH => PlaceWallOn(board, p.Row, p.Col, isHorizontal: true),
-            PlacementType.WallV => PlaceWallOn(board, p.Row, p.Col, isHorizontal: false),
+            PlacementType.WallH => PlaceWallOn(board, p.Row, p.Col, true),
+            PlacementType.WallV => PlaceWallOn(board, p.Row, p.Col, false),
             _ => false
         };
     }
+
     private void IncrementPlacementCount(Placement p)
     {
         if (p.Type == PlacementType.ArcherTower)
             totalArcherTowersPlaced++;
         else
-            totalWallsPlaced++; // WallH or WallV
+            totalWallsPlaced++;
     }
 
     private bool CanPlaceArcherTower(int[,] board, int row, int col)
@@ -618,19 +730,15 @@ public class TowerDefenceAI
         if (isHorizontal)
         {
             if (row >= BOARD_SIZE || col + WALL_LEN > BOARD_SIZE) return false;
-
             for (int c = col; c < col + WALL_LEN; c++)
                 if (board[row, c] != 0) return false;
-
             return true;
         }
         else
         {
             if (row + WALL_LEN > BOARD_SIZE || col >= BOARD_SIZE) return false;
-
             for (int r = row; r < row + WALL_LEN; r++)
                 if (board[r, col] != 0) return false;
-
             return true;
         }
     }
@@ -640,69 +748,75 @@ public class TowerDefenceAI
         if (!CanPlaceWall(board, row, col, isHorizontal)) return false;
 
         if (isHorizontal)
-        {
             for (int c = col; c < col + WALL_LEN; c++)
                 board[row, c] = 2;
-        }
         else
-        {
             for (int r = row; r < row + WALL_LEN; r++)
                 board[r, col] = 2;
-        }
 
         return true;
     }
 
-    // =========================================
-    // Manual placement (optional)
-    // =========================================
-    public bool PlaceArcherTower(int row, int col) => PlaceArcherTowerOn(aiBoard, row, col);
-    public bool PlaceWall(int row, int col, bool isHorizontal) => PlaceWallOn(aiBoard, row, col, isHorizontal);
-
-    // =========================================
-    // Printing
-    // =========================================
-    public void PrintBoards()
+    // Find minimum distance from candidate tower to any tile on a given path
+    private int FindMinDistanceToPath(List<(int r, int c)> path, int towerRow, int towerCol)
     {
-        Console.WriteLine("\n" + new string(' ', 5) + "AI BOARD" + new string(' ', 5) + "DEADZONE" + new string(' ', 5) + "USER BOARD");
-        Console.WriteLine("  0 1 2 3 4 5 6 7 8" + new string(' ', 5) + "  0 1 2 3 4 5 6 7 8");
+        int minDist = int.MaxValue;
 
-        for (int r = 0; r < BOARD_SIZE; r++)
+        // For each tile in the path, calculate Chebyshev distance to tower
+        foreach (var (pathR, pathC) in path)
         {
-            Console.Write(r + " ");
-            for (int c = 0; c < BOARD_SIZE; c++)
+            // Check distance to any cell of the 2x2 tower
+            for (int r = towerRow; r < towerRow + 2; r++)
             {
-                char symbol = aiBoard[r, c] switch
+                for (int c = towerCol; c < towerCol + 2; c++)
                 {
-                    0 => '.',
-                    1 => 'A',
-                    2 => 'W',
-                    _ => '?'
-                };
-                Console.Write(symbol + " ");
+                    int cheb = Math.Max(Math.Abs(pathR - r), Math.Abs(pathC - c));
+                    if (cheb < minDist)
+                        minDist = cheb;
+                }
             }
-
-            Console.Write(new string(' ', DEADZONE_WIDTH * 2 + 1));
-
-            Console.Write(r + " ");
-            for (int c = 0; c < BOARD_SIZE; c++)
-            {
-                char symbol = userBoard[r, c] switch
-                {
-                    0 => '.',
-                    1 => 'A',
-                    2 => 'W',
-                    _ => '?'
-                };
-                Console.Write(symbol + " ");
-            }
-            Console.WriteLine();
         }
+
+        return minDist == int.MaxValue ? 100 : minDist;  // Return high distance if no path
     }
 
-    // =========================================
-    // Utilities
-    // =========================================
+    // Find minimum distance from candidate tower to any existing tower
+    private int FindMinDistanceToExistingTower(int[,] board, int newTowerRow, int newTowerCol)
+    {
+        int minDist = int.MaxValue;
+
+        // Scan board for existing towers (2x2 blocks of 1s)
+        for (int r = 0; r < BOARD_SIZE - 1; r++)
+        {
+            for (int c = 0; c < BOARD_SIZE - 1; c++)
+            {
+                if (board[r, c] == 1 && board[r, c + 1] == 1 &&
+                    board[r + 1, c] == 1 && board[r + 1, c + 1] == 1)
+                {
+                    // Found existing tower at (r, c) - calculate distance to new tower
+                    int existingTowerRow = r;
+                    int existingTowerCol = c;
+                    
+                    int dist = Math.Max(
+                        Math.Abs(newTowerRow - existingTowerRow),
+                        Math.Abs(newTowerCol - existingTowerCol)
+                    );
+                    
+                    if (dist < minDist)
+                        minDist = dist;
+                }
+            }
+        }
+
+        return minDist;
+    }
+
+    // Public getter for last predicted spawn/goal
+    public ((int r, int c) spawn, (int r, int c) goal) GetLastPredictedPath()
+    {
+        return (lastPredictedSpawn, lastPredictedGoal);
+    }
+
     private int[,] CopyBoard(int[,] src)
     {
         int[,] dst = new int[BOARD_SIZE, BOARD_SIZE];
@@ -720,5 +834,4 @@ public class TowerDefenceAI
             (list[i], list[j]) = (list[j], list[i]);
         }
     }
-}
 }
