@@ -74,18 +74,20 @@ public class TDEnemyPlayerAI : MonoBehaviour
         }
 
         int[,] board = ai.GetAIBoard();
-        bool[,] processed = new bool[9, 9];
+        int rows = board.GetLength(0);
+        int cols = board.GetLength(1);
+        bool[,] processed = new bool[rows, cols];
         int placedCount = 0;
 
         // First pass: Place archer towers (2x2 blocks with single center instance)
-        for (int r = 0; r < 9; r++)
+        for (int r = 0; r < rows; r++)
         {
-            for (int c = 0; c < 9; c++)
+            for (int c = 0; c < cols; c++)
             {
                 if (processed[r, c]) continue;
 
                 // Check for 2x2 archer tower pattern
-                if (board[r, c] == 1 && r + 1 < 9 && c + 1 < 9 &&
+                if (board[r, c] == 1 && r + 1 < rows && c + 1 < cols &&
                     board[r, c] == 1 && board[r, c + 1] == 1 &&
                     board[r + 1, c] == 1 && board[r + 1, c + 1] == 1)
                 {
@@ -122,9 +124,9 @@ public class TDEnemyPlayerAI : MonoBehaviour
         }
 
         // Second pass: Place walls (1x4 or 4x1 blocks, cell by cell)
-        for (int r = 0; r < 9; r++)
+        for (int r = 0; r < rows; r++)
         {
-            for (int c = 0; c < 9; c++)
+            for (int c = 0; c < cols; c++)
             {
                 if (processed[r, c]) continue;
                 if (board[r, c] != 2) continue;
@@ -148,8 +150,8 @@ public class TDEnemyPlayerAI : MonoBehaviour
                 }
 
                 // Determine wall orientation - check adjacent cells
-                bool hasHorizontalNeighbor = (c + 1 < 9 && board[r, c + 1] == 2) || (c - 1 >= 0 && board[r, c - 1] == 2);
-                bool hasVerticalNeighbor = (r + 1 < 9 && board[r + 1, c] == 2) || (r - 1 >= 0 && board[r - 1, c] == 2);
+                bool hasHorizontalNeighbor = (c + 1 < cols && board[r, c + 1] == 2) || (c - 1 >= 0 && board[r, c - 1] == 2);
+                bool hasVerticalNeighbor = (r + 1 < rows && board[r + 1, c] == 2) || (r - 1 >= 0 && board[r - 1, c] == 2);
                 
                 GameObject instance = Instantiate(wallBlockPrefab, cell.worldPosition, Quaternion.identity);
                 
@@ -175,7 +177,7 @@ public class TowerDefenceAI
     private int[,] aiBoard;
     private int[,] userBoard;
 
-    private const int BOARD_SIZE = 9;
+    private const int BOARD_SIZE = 8;
     private const int ARCHER_TOWER_SIZE = 2;     // 2x2
     private const int WALL_LEN = 4;              // 1x4 or 4x1
     private const int DEADZONE_WIDTH = 2;
