@@ -3294,6 +3294,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1382999907}
   m_Mesh: {fileID: 8733429697405204941, guid: 38b797ba6cc77df40a51cd3200365644, type: 3}
+--- !u!4 &1391057378 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5537070143644670331, guid: 5c149baf016750b42ac7e9cdbc905b96,
+    type: 3}
+  m_PrefabInstance: {fileID: 1090135069}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1397859827
 GameObject:
   m_ObjectHideFlags: 0
@@ -3891,10 +3897,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tacticalGrid: {fileID: 434443815}
-  rightControllerTransform: {fileID: 1837460862}
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  autoFindRightController: 1
+  rightControllerTransform: {fileID: 1391057378}
   maxRayDistance: 30
   showRay: 1
   rayLine: {fileID: 0}
@@ -4550,12 +4557,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1780599688}
   m_CullTransparentMesh: 1
---- !u!4 &1837460862 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1598265495627328688, guid: 5c149baf016750b42ac7e9cdbc905b96,
-    type: 3}
-  m_PrefabInstance: {fileID: 1090135069}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1858426801
 GameObject:
   m_ObjectHideFlags: 0
