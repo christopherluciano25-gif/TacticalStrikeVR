@@ -2,33 +2,37 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// VR placement system for Unity XR
-/// Works with Meta XR SDK
+/// FIXED VR placement system for Unity XR
+/// Works with Meta Quest controllers
 /// Right controller raycast for placement
-/// Grip button: rotate wall/tower
+/// A button (primaryButton): Select from menu
 /// Trigger: place unit
+/// Grip: rotate wall/tower
 /// </summary>
 public class UnitPlacer : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private TacticalGrid tacticalGrid;
-    [SerializeField] private Transform rightControllerTransform; // Drag RightInteractors here
-    [SerializeField] private LayerMask groundLayerMask;
-
+    [SerializeField] private LayerMask groundLayerMask; // Set to layer of BattleArea
+    
+    [Header("VR Controller Setup")]
+    [SerializeField] private bool autoFindRightController = true;
+    [SerializeField] private Transform rightControllerTransform; // Optional: manually assign
+    
     [Header("Raycast Settings")]
     [SerializeField] private float maxRayDistance = 30f;
-
+    
     [Header("Visual Feedback")]
     [SerializeField] private bool showRay = true;
     [SerializeField] private LineRenderer rayLine;
     [SerializeField] private Color validRayColor = Color.green;
     [SerializeField] private Color invalidRayColor = Color.red;
     [SerializeField] private Color normalRayColor = Color.cyan;
-
+    
     [Header("Preview Settings")]
     [SerializeField] private bool showPreview = true;
     [SerializeField] private float previewAlpha = 0.5f;
-
+    
     // Current placement state
     private bool isPlacementMode = false;
     private GameObject currentPrefab = null;
@@ -38,29 +42,35 @@ public class UnitPlacer : MonoBehaviour
     private int currentHeight = 1;
     private RotationAngle currentRotation = RotationAngle.Rotate0;
     private TeamSide playerTeam = TeamSide.Player;
-
+    
     // Current hover state
     private GridCell currentHoverCell = null;
     private bool isValidPlacement = false;
-
+    
     // Input tracking
     private bool previousGripState = false;
     private bool previousTriggerState = false;
-
+    
     private void Awake()
     {
         if (tacticalGrid == null)
             tacticalGrid = FindObjectOfType<TacticalGrid>();
-
+        
+        // Auto-find right controller if not assigned
+        if (autoFindRightController && rightControllerTransform == null)
+        {
+            FindRightController();
+        }
+        
         if (rayLine == null && showRay)
             SetupRayLine();
     }
-
+    
     private void Update()
     {
         // Perform raycast
         PerformRaycast();
-
+        
         // Handle input
         if (isPlacementMode)
         {
@@ -68,12 +78,53 @@ public class UnitPlacer : MonoBehaviour
             HandlePlacementInput();
             UpdatePreview();
         }
-
+        
         UpdateRayVisual();
     }
-
+    
+    #region Controller Setup
+    
+    /// <summary>
+    /// Auto-find the right controller in XR Origin
+    /// </summary>
+    private void FindRightController()
+    {
+        // Method 1: Find by name
+        GameObject rightController = GameObject.Find("RightHand Controller");
+        
+        if (rightController == null)
+        {
+            // Method 2: Search for XR Origin structure
+            GameObject xrOrigin = GameObject.Find("XR Origin");
+            if (xrOrigin != null)
+            {
+                Transform cameraOffset = xrOrigin.transform.Find("Camera Offset");
+                if (cameraOffset != null)
+                {
+                    Transform rightHand = cameraOffset.Find("RightHand Controller");
+                    if (rightHand != null)
+                    {
+                        rightController = rightHand.gameObject;
+                    }
+                }
+            }
+        }
+        
+        if (rightController != null)
+        {
+            rightControllerTransform = rightController.transform;
+            Debug.Log($"[UnitPlacer] Auto-found right controller: {rightController.name}");
+        }
+        else
+        {
+            Debug.LogError("[UnitPlacer] Could not find right controller! Please assign manually.");
+        }
+    }
+    
+    #endregion
+    
     #region Placement Control
-
+    
     public void StartPlacement(GameObject prefab, UnitType unitType, int width, int height)
     {
         currentPrefab = prefab;
@@ -82,101 +133,104 @@ public class UnitPlacer : MonoBehaviour
         currentHeight = height;
         currentRotation = RotationAngle.Rotate0;
         isPlacementMode = true;
-
+        
         CreatePreview();
-
+        
         Debug.Log($"[UnitPlacer] Started placing {unitType} ({width}x{height})");
     }
-
+    
     public void CancelPlacement()
     {
         isPlacementMode = false;
         currentPrefab = null;
         currentUnitType = UnitType.Empty;
-
+        
         if (previewObject != null)
         {
             Destroy(previewObject);
             previewObject = null;
         }
-
+        
         if (tacticalGrid != null)
             tacticalGrid.ClearAllHighlights();
-
+        
         Debug.Log("[UnitPlacer] Cancelled placement");
     }
-
+    
     public bool IsInPlacementMode()
     {
         return isPlacementMode;
     }
-
+    
     #endregion
-
+    
     #region Raycast
-
+    
     private void PerformRaycast()
     {
+        // Check if controller is assigned
         if (rightControllerTransform == null)
         {
-            Debug.LogWarning("[UnitPlacer] Right controller transform is NULL!");
+            if (Time.frameCount % 120 == 0) // Log once every 2 seconds
+            {
+                Debug.LogWarning("[UnitPlacer] Right controller transform is NULL! Trying to find it...");
+                if (autoFindRightController)
+                    FindRightController();
+            }
             currentHoverCell = null;
             return;
         }
-
+        
         if (tacticalGrid == null)
         {
-            Debug.LogWarning("[UnitPlacer] TacticalGrid is NULL!");
+            if (Time.frameCount % 120 == 0)
+            {
+                Debug.LogWarning("[UnitPlacer] TacticalGrid is NULL!");
+            }
             currentHoverCell = null;
             return;
         }
-
-        Ray ray = new Ray(rightControllerTransform.position, rightControllerTransform.forward);
+        
+        // Create ray from controller
+        Vector3 rayOrigin = rightControllerTransform.position;
+        Vector3 rayDirection = rightControllerTransform.forward;
+        
+        Ray ray = new Ray(rayOrigin, rayDirection);
         RaycastHit hit;
-
-        // Draw debug ray in Scene view
-        Debug.DrawRay(ray.origin, ray.direction * maxRayDistance, Color.yellow);
-
-        // Debug log once per second
-        if (Time.frameCount % 60 == 0)
-        {
-            Debug.Log($"[UnitPlacer] Ray origin: {ray.origin}, direction: {ray.direction}");
-            Debug.Log($"[UnitPlacer] Ground layer mask: {groundLayerMask.value}");
-        }
-
+        
+        // Visual debug ray in Scene view
+        Debug.DrawRay(rayOrigin, rayDirection * maxRayDistance, Color.yellow);
+        
+        // Perform raycast
         if (Physics.Raycast(ray, out hit, maxRayDistance, groundLayerMask))
         {
-            Debug.Log($"[UnitPlacer] HIT: {hit.collider.gameObject.name} on layer {hit.collider.gameObject.layer}");
+            // Hit something!
             GridCell cell = tacticalGrid.GetCellAtWorldPosition(hit.point);
-
+            
             if (cell != null)
             {
-                Debug.Log($"[UnitPlacer] Found cell at ({cell.gridX}, {cell.gridZ})");
+                UpdateHoverCell(cell);
             }
             else
             {
-                Debug.LogWarning($"[UnitPlacer] Hit point {hit.point} didn't match any grid cell!");
+                // Hit ground but outside grid bounds
+                UpdateHoverCell(null);
             }
-
-            UpdateHoverCell(cell);
         }
         else
         {
-            // Only log occasionally to avoid spam
-            if (Time.frameCount % 120 == 0)
-            {
-                Debug.LogWarning("[UnitPlacer] Raycast missed - check BattleArea has collider and correct layer!");
-            }
+            // Didn't hit anything
             UpdateHoverCell(null);
         }
     }
-
+    
     private void UpdateHoverCell(GridCell cell)
     {
         currentHoverCell = cell;
-
+        
         if (isPlacementMode && currentHoverCell != null)
         {
+            // Check if placement is valid
             isValidPlacement = tacticalGrid.ValidatePlacement(
                 currentHoverCell.gridX,
                 currentHoverCell.gridZ,
@@ -186,7 +240,8 @@ public class UnitPlacer : MonoBehaviour
                 currentUnitType,
                 currentRotation
             );
-
+            
+            // Get cells that would be occupied
             List<GridCell> cells = tacticalGrid.GetCellsForPlacement(
                 currentHoverCell.gridX,
                 currentHoverCell.gridZ,
@@ -194,7 +249,8 @@ public class UnitPlacer : MonoBehaviour
                 currentHeight,
                 currentRotation
             );
-
+            
+            // Highlight cells
             tacticalGrid.HighlightCells(cells, isValidPlacement);
         }
         else
@@ -203,41 +259,41 @@ public class UnitPlacer : MonoBehaviour
                 tacticalGrid.ClearAllHighlights();
         }
     }
-
+    
     #endregion
-
+    
     #region Input Handling
-
+    
     private void HandleRotationInput()
     {
-        // Try Meta XR input first
+        // Grip button to rotate (hand trigger on Quest)
         bool gripPressed = OVRInput.Get(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch);
-
+        
         if (gripPressed && !previousGripState)
         {
             RotatePreview();
         }
-
+        
         previousGripState = gripPressed;
     }
-
+    
     private void HandlePlacementInput()
     {
-        // Try Meta XR input first
+        // Trigger button to place (index trigger on Quest)
         bool triggerPressed = OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch);
-
+        
         if (triggerPressed && !previousTriggerState)
         {
             TryPlaceUnit();
         }
-
+        
         previousTriggerState = triggerPressed;
     }
-
+    
     #endregion
-
+    
     #region Rotation
-
+    
     private void RotatePreview()
     {
         switch (currentRotation)
@@ -255,34 +311,43 @@ public class UnitPlacer : MonoBehaviour
                 currentRotation = RotationAngle.Rotate0;
                 break;
         }
-
+        
         Debug.Log($"[UnitPlacer] Rotated to {currentRotation}");
-
+        
         if (previewObject != null)
         {
             previewObject.transform.rotation = Quaternion.Euler(0f, (float)currentRotation, 0f);
         }
-
+        
+        // Re-validate placement with new rotation
         UpdateHoverCell(currentHoverCell);
     }
-
+    
     #endregion
-
+    
     #region Placement
-
+    
     private void TryPlaceUnit()
     {
         if (!isPlacementMode || currentHoverCell == null || !isValidPlacement)
         {
             Debug.LogWarning("[UnitPlacer] Cannot place: invalid state");
+            
+            // Haptic feedback for invalid placement
+            OVRInput.SetControllerVibration(0.5f, 0.1f, OVRInput.Controller.RTouch);
+            
             return;
         }
-
+        
+        // Get placement position
         Vector3 spawnPos = GetPlacementWorldPosition();
         Quaternion spawnRot = Quaternion.Euler(0f, (float)currentRotation, 0f);
+        
+        // Instantiate the unit
         GameObject placedUnit = Instantiate(currentPrefab, spawnPos, spawnRot);
         placedUnit.name = $"{currentUnitType}_{currentHoverCell.gridX}_{currentHoverCell.gridZ}";
-
+        
+        // Register with grid
         bool success = tacticalGrid.PlaceUnit(
             currentHoverCell.gridX,
             currentHoverCell.gridZ,
@@ -293,10 +358,13 @@ public class UnitPlacer : MonoBehaviour
             placedUnit,
             currentRotation
         );
-
+        
         if (success)
         {
             Debug.Log($"[UnitPlacer] Placed {currentUnitType} at ({currentHoverCell.gridX}, {currentHoverCell.gridZ})");
+            
+            // Success haptic feedback
+            OVRInput.SetControllerVibration(0.3f, 0.1f, OVRInput.Controller.RTouch);
         }
         else
         {
@@ -304,44 +372,44 @@ public class UnitPlacer : MonoBehaviour
             Debug.LogError("[UnitPlacer] Failed to register unit with grid");
         }
     }
-
+    
     private Vector3 GetPlacementWorldPosition()
     {
         if (currentHoverCell == null) return Vector3.zero;
-
+        
         int rotatedWidth = currentWidth;
         int rotatedHeight = currentHeight;
-
+        
         if (currentRotation == RotationAngle.Rotate90 || currentRotation == RotationAngle.Rotate270)
         {
             rotatedWidth = currentHeight;
             rotatedHeight = currentWidth;
         }
-
+        
         float offsetX = (rotatedWidth - 1) * tacticalGrid.CellWidth / 2f;
         float offsetZ = (rotatedHeight - 1) * tacticalGrid.CellHeight / 2f;
-
+        
         return currentHoverCell.worldPosition + new Vector3(offsetX, 0f, offsetZ);
     }
-
+    
     #endregion
-
+    
     #region Preview
-
+    
     private void CreatePreview()
     {
         if (currentPrefab == null || !showPreview) return;
-
+        
         if (previewObject != null)
             Destroy(previewObject);
-
+        
         previewObject = Instantiate(currentPrefab);
         previewObject.name = "PlacementPreview";
-
+        
         MakeTransparent(previewObject);
         DisableComponents(previewObject);
     }
-
+    
     private void UpdatePreview()
     {
         if (previewObject == null || currentHoverCell == null)
@@ -350,15 +418,15 @@ public class UnitPlacer : MonoBehaviour
                 previewObject.SetActive(false);
             return;
         }
-
+        
         previewObject.SetActive(true);
-
+        
         Vector3 previewPos = GetPlacementWorldPosition();
         previewObject.transform.position = previewPos;
-
+        
         UpdatePreviewColor(isValidPlacement);
     }
-
+    
     private void MakeTransparent(GameObject obj)
     {
         Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
@@ -372,20 +440,20 @@ public class UnitPlacer : MonoBehaviour
                 mat.SetInt("_ZWrite", 0);
                 mat.EnableKeyword("_ALPHABLEND_ON");
                 mat.renderQueue = 3000;
-
+                
                 Color c = mat.color;
                 c.a = previewAlpha;
                 mat.color = c;
             }
         }
     }
-
+    
     private void UpdatePreviewColor(bool valid)
     {
         if (previewObject == null) return;
-
+        
         Color targetColor = valid ? validRayColor : invalidRayColor;
-
+        
         Renderer[] renderers = previewObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
@@ -397,17 +465,17 @@ public class UnitPlacer : MonoBehaviour
             }
         }
     }
-
+    
     private void DisableComponents(GameObject obj)
     {
         Collider[] colliders = obj.GetComponentsInChildren<Collider>();
         foreach (Collider col in colliders)
             col.enabled = false;
-
+        
         Rigidbody[] rbs = obj.GetComponentsInChildren<Rigidbody>();
         foreach (Rigidbody rb in rbs)
             rb.isKinematic = true;
-
+        
         MonoBehaviour[] scripts = obj.GetComponentsInChildren<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
@@ -415,19 +483,23 @@ public class UnitPlacer : MonoBehaviour
                 script.enabled = false;
         }
     }
-
+    
     #endregion
-
+    
     #region Ray Visual
-
+    
     private void SetupRayLine()
     {
-        if (rightControllerTransform == null) return;
-
+        if (rightControllerTransform == null)
+        {
+            Debug.LogWarning("[UnitPlacer] Cannot setup ray line - no controller assigned yet");
+            return;
+        }
+        
         GameObject rayObj = new GameObject("RayVisual");
         rayObj.transform.SetParent(rightControllerTransform);
         rayObj.transform.localPosition = Vector3.zero;
-
+        
         rayLine = rayObj.AddComponent<LineRenderer>();
         rayLine.startWidth = 0.01f;
         rayLine.endWidth = 0.01f;
@@ -435,29 +507,43 @@ public class UnitPlacer : MonoBehaviour
         rayLine.material = new Material(Shader.Find("Sprites/Default"));
         rayLine.startColor = normalRayColor;
         rayLine.endColor = normalRayColor;
+        
+        Debug.Log("[UnitPlacer] Ray line setup complete");
     }
-
+    
     private void UpdateRayVisual()
     {
-        if (!showRay || rayLine == null || rightControllerTransform == null) return;
-
+        if (!showRay || rayLine == null || rightControllerTransform == null)
+        {
+            // Try to setup ray line if it doesn't exist yet
+            if (showRay && rayLine == null && rightControllerTransform != null)
+            {
+                SetupRayLine();
+            }
+            return;
+        }
+        
+        // Update ray line positions
         rayLine.SetPosition(0, rightControllerTransform.position);
-
+        
         if (currentHoverCell != null)
         {
+            // Ray hits grid cell
             rayLine.SetPosition(1, currentHoverCell.worldPosition);
-
+            
+            // Set color based on validity
             Color color = isPlacementMode ? (isValidPlacement ? validRayColor : invalidRayColor) : normalRayColor;
             rayLine.startColor = color;
             rayLine.endColor = color;
         }
         else
         {
+            // Ray doesn't hit anything
             rayLine.SetPosition(1, rightControllerTransform.position + rightControllerTransform.forward * maxRayDistance);
             rayLine.startColor = normalRayColor;
             rayLine.endColor = normalRayColor;
         }
     }
-
+    
     #endregion
 }
