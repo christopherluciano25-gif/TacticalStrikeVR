@@ -2,22 +2,25 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Knight - Melee unit that moves and attacks
-/// STRONG against: Bombers (2x damage)
-/// WEAK against: Archers (takes 2x damage)
-/// NEUTRAL against: Knights, Walls, Bases
+/// Bomber - Fast suicide unit
+/// STRONG against: Archers (2x damage)
+/// WEAK against: Knights (takes 2x damage)
+/// Targets: Bases > Walls > Archers (ignores other units)
+/// Explodes on contact, dealing AOE damage
 /// </summary>
-public class Knight : MonoBehaviour
+public class Bomber : MonoBehaviour
 {
     [Header("Stats")]
-    [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private float attackDamage = 15f;
-    [SerializeField] private float attackRange = 1.5f;
-    [SerializeField] private float attackCooldown = 1f;
+    [SerializeField] private float maxHealth = 40f;
+    [SerializeField] private float moveSpeed = 4f; // Fixed typo: Changed SerializfeField to SerializeField
+    [SerializeField] private float explosionDamage = 50f;
+    [SerializeField] private float explosionRadius = 2f;
     
     [Header("Team")]
     public TeamSide team = TeamSide.Player;
+    
+    [Header("Explosion Effect")]
+    [SerializeField] private GameObject explosionEffectPrefab;
     
     [Header("References")]
     [SerializeField] private TacticalGrid grid;
@@ -25,13 +28,13 @@ public class Knight : MonoBehaviour
     // State
     private float currentHealth;
     private bool isDead = false;
+    private bool hasExploded = false;
     private GameObject currentTarget = null;
-    private float lastAttackTime = 0f;
     private Vector2Int gridPosition;
     
     // Combat multipliers (Archers > Knights > Bombers > Archers)
-    private const float STRONG_MULTIPLIER = 2f;  // vs Bombers
-    private const float WEAK_MULTIPLIER = 2f;    // from Archers
+    private const float STRONG_MULTIPLIER = 2f;  // vs Archers
+    private const float WEAK_MULTIPLIER = 2f;    // from Knights
     
     private void Start()
     {
@@ -54,46 +57,42 @@ public class Knight : MonoBehaviour
     }
     
     /// <summary>
-    /// Main AI loop - find target, move, attack
+    /// Main AI loop - find priority target and rush it
     /// </summary>
     private IEnumerator AILoop()
     {
-        while (!isDead)
+        while (!isDead && !hasExploded)
         {
-            // Find nearest enemy
-            currentTarget = FindNearestEnemy();
+            // Find target (prioritize: Bases > Walls > Archers)
+            currentTarget = FindPriorityTarget();
             
             if (currentTarget != null)
             {
                 float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
                 
-                if (distance <= attackRange)
+                if (distance <= 1f) // Close enough to explode
                 {
-                    // In range - attack
-                    if (Time.time >= lastAttackTime + attackCooldown)
-                    {
-                        Attack(currentTarget);
-                        lastAttackTime = Time.time;
-                    }
+                    Explode();
                 }
                 else
                 {
-                    // Too far - move closer
+                    // Rush towards target (bombers move fast!)
                     MoveTowards(currentTarget.transform.position);
                 }
             }
             
-            yield return new WaitForSeconds(0.1f); // Update 10 times per second
+            yield return new WaitForSeconds(0.05f); // Update 20 times per second (fast!)
         }
     }
     
     /// <summary>
-    /// Find nearest enemy (prioritize: Bombers > Bases > Knights > Archers > Walls)
+    /// Find priority target: Bases > Walls > Archers
+    /// Bombers IGNORE knights and other bombers
     /// </summary>
-    private GameObject FindNearestEnemy()
+    private GameObject FindPriorityTarget()
     {
         GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-        GameObject nearestEnemy = null;
+        GameObject bestTarget = null;
         float nearestDistance = Mathf.Infinity;
         int highestPriority = -1;
         
@@ -104,38 +103,42 @@ public class Knight : MonoBehaviour
             if (objTeam == TeamSide.Neutral || objTeam == team)
                 continue;
             
-            // Get priority (higher = more important target)
+            // Get priority
             int priority = GetTargetPriority(obj);
+            if (priority == 0) continue; // Ignore this type
+            
             float distance = Vector3.Distance(transform.position, obj.transform.position);
             
             // Choose target based on priority, then distance
             if (priority > highestPriority || (priority == highestPriority && distance < nearestDistance))
             {
-                nearestEnemy = obj;
+                bestTarget = obj;
                 nearestDistance = distance;
                 highestPriority = priority;
             }
         }
         
-        return nearestEnemy;
+        return bestTarget;
     }
     
     private int GetTargetPriority(GameObject obj)
     {
-        // Knights prioritize bombers (strong against)
-        if (obj.GetComponent<Bomber>() != null) return 5; // Highest priority
+        // PRIORITY 1: Enemy Base (win condition!)
+        if (obj.GetComponent<BaseHealth>() != null) return 5;
         
-        // Then bases (win condition)
-        if (obj.GetComponent<BaseHealth>() != null) return 4;
+        // PRIORITY 2: Walls (bombers destroy walls)
+        if (obj.GetComponent<WallHealth>() != null) return 4;
         
-        // Then other knights
-        if (obj.GetComponent<Knight>() != null) return 3;
+        // PRIORITY 3: Archers (we're strong against them)
+        if (obj.GetComponent<Archer>() != null) return 3;
         
-        // Then archers (we're weak against them, but still attack)
-        if (obj.GetComponent<Archer>() != null) return 2;
+        // IGNORE: Knights (they counter us)
+        if (obj.GetComponent<Knight>() != null) return 0;
         
-        // Walls/towers lowest priority
-        return 1;
+        // IGNORE: Other bombers
+        if (obj.GetComponent<Bomber>() != null) return 0;
+        
+        return 1; // Low priority for anything else
     }
     
     private TeamSide GetObjectTeam(GameObject obj)
@@ -152,11 +155,14 @@ public class Knight : MonoBehaviour
         BaseHealth baseHealth = obj.GetComponent<BaseHealth>();
         if (baseHealth != null) return baseHealth.Owner;
         
+        WallHealth wallHealth = obj.GetComponent<WallHealth>();
+        if (wallHealth != null) return wallHealth.Owner;
+        
         return TeamSide.Neutral;
     }
     
     /// <summary>
-    /// Move towards target position
+    /// Move towards target (fast!)
     /// </summary>
     private void MoveTowards(Vector3 targetPos)
     {
@@ -169,35 +175,60 @@ public class Knight : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction);
         }
         
-        // Update grid position
         UpdateGridPosition();
     }
     
     /// <summary>
-    /// Attack target - apply damage with combat multipliers
+    /// EXPLODE! Deal AOE damage and die
     /// </summary>
-    private void Attack(GameObject target)
+    private void Explode()
     {
-        float finalDamage = attackDamage;
+        if (hasExploded) return;
         
-        // Check rock-paper-scissors logic
-        Bomber bomber = target.GetComponent<Bomber>();
-        if (bomber != null)
+        hasExploded = true;
+        
+        Debug.Log($"[Bomber] {team} bomber EXPLODED at {transform.position}!");
+        
+        // Spawn explosion effect
+        if (explosionEffectPrefab != null)
         {
-            // STRONG vs Bombers
-            finalDamage *= STRONG_MULTIPLIER;
-            Debug.Log($"[Knight] STRONG attack vs Bomber! {finalDamage} damage");
+            Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // Apply damage to target
-        ApplyDamageToTarget(target, finalDamage);
+        // Find all objects in explosion radius
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
         
-        Debug.Log($"[Knight] {team} knight attacks {target.name} for {finalDamage} damage");
+        foreach (Collider col in hitColliders)
+        {
+            GameObject obj = col.gameObject;
+            
+            // Don't damage self or allies
+            TeamSide objTeam = GetObjectTeam(obj);
+            if (objTeam == team) continue;
+            
+            // Calculate damage (closer = more damage)
+            float distance = Vector3.Distance(transform.position, obj.transform.position);
+            float damageFalloff = 1f - (distance / explosionRadius);
+            float finalDamage = explosionDamage * damageFalloff;
+            
+            // Apply combat multiplier if target is Archer
+            Archer archer = obj.GetComponent<Archer>();
+            if (archer != null)
+            {
+                finalDamage *= STRONG_MULTIPLIER;
+                Debug.Log($"[Bomber] STRONG explosion vs Archer! {finalDamage} damage");
+            }
+            
+            // Deal damage
+            ApplyDamageToTarget(obj, finalDamage);
+        }
+        
+        // Bomber dies from explosion
+        Die();
     }
     
     private void ApplyDamageToTarget(GameObject target, float damage)
     {
-        // Try different health components
         Knight knight = target.GetComponent<Knight>();
         if (knight != null)
         {
@@ -235,42 +266,39 @@ public class Knight : MonoBehaviour
     }
     
     /// <summary>
-    /// Take damage - check if from Archer for weakness multiplier
+    /// Take damage - WEAK against Knights
     /// </summary>
     public void TakeDamage(float damage, GameObject attacker)
     {
-        if (isDead) return;
+        if (isDead || hasExploded) return;
         
         float finalDamage = damage;
         
-        // Check if attacker is Archer (we're weak against archers)
-        Archer archer = attacker.GetComponent<Archer>();
-        if (archer != null)
+        // Check if attacker is Knight (we're weak against knights)
+        Knight knight = attacker.GetComponent<Knight>();
+        if (knight != null)
         {
-            // WEAK vs Archers - take extra damage
             finalDamage *= WEAK_MULTIPLIER;
-            Debug.Log($"[Knight] WEAK! Taking extra damage from Archer! {finalDamage} total");
+            Debug.Log($"[Bomber] WEAK! Taking extra damage from Knight! {finalDamage} total");
         }
         
         currentHealth -= finalDamage;
-        Debug.Log($"[Knight] {team} knight took {finalDamage} damage. HP: {currentHealth}/{maxHealth}");
+        Debug.Log($"[Bomber] {team} bomber took {finalDamage} damage. HP: {currentHealth}/{maxHealth}");
         
         if (currentHealth <= 0)
         {
+            // Die but DON'T explode (killed before reaching target)
             Die();
         }
     }
     
-    /// <summary>
-    /// Handle death
-    /// </summary>
     private void Die()
     {
         if (isDead) return;
         
         isDead = true;
         
-        Debug.Log($"[Knight] {team} knight died at {gridPosition}");
+        Debug.Log($"[Bomber] {team} bomber died at {gridPosition}");
         
         // Remove from grid
         if (grid != null)
@@ -278,24 +306,6 @@ public class Knight : MonoBehaviour
             grid.RemoveUnit(this.gameObject);
         }
         
-        // Destroy object
         Destroy(gameObject, 0.1f);
-    }
-    
-    // Debug visualization
-    private void OnDrawGizmos()
-    {
-        if (isDead) return;
-        
-        // Draw attack range
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-        
-        // Draw line to current target
-        if (currentTarget != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, currentTarget.transform.position);
-        }
     }
 }

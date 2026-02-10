@@ -21,7 +21,7 @@ public class Archer : MonoBehaviour
     [SerializeField] private float arrowSpeed = 15f;
     
     [Header("Team")]
-    [SerializeField] private TeamSide team = TeamSide.Player;
+    public TeamSide team = TeamSide.Player;
     
     [Header("References")]
     [SerializeField] private TacticalGrid grid;
@@ -99,7 +99,7 @@ public class Archer : MonoBehaviour
     /// </summary>
     private GameObject FindNearestEnemyInRange()
     {
-        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         GameObject nearestEnemy = null;
         float nearestDistance = Mathf.Infinity;
         int highestPriority = -1;
