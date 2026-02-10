@@ -1,9 +1,9 @@
-Built from '6000.0/staging' branch; Version is '6000.0.62f1 (f99f05b3e950) revision 16359173'; Using compiler version '193933523'; Build Type 'Release'
-OS: 'Windows 10  (10.0.19045) 64bit Core' Language: 'en' Physical Memory: 12121 MB
-BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
-Date: 2026-02-03T20:18:32Z
 [Licensing::Module] Trying to connect to existing licensing client channel...
-[Licensing::IpcConnector] Successfully connected to: "LicenseClient-17143" at "2026-02-03T20:18:32.0110621Z"
+Built from '6000.0/staging' branch; Version is '6000.0.62f1 (f99f05b3e950) revision 16359173'; Using compiler version '193933523'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-escha" at "2026-02-10T18:26:59.275051Z"
+OS: 'Windows 11  (10.0.26200) 64bit Core' Language: 'en' Physical Memory: 16052 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+Date: 2026-02-10T18:26:59Z
 
 COMMAND LINE ARGUMENTS:
 C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Unity.exe
@@ -13,23 +13,23 @@ C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Unity.exe
 -name
 AssetImportWorker3
 -projectPath
-C:/Users/17143/Documents/GitHub/TacticalStrikeVR
+C:/Users/escha/OneDrive/Documents/GitHub/TacticalStrikeVR
 -logFile
 Logs/AssetImportWorker3.log
 -srvPort
-56864
+50469
 -licensingIpc
-LicenseClient-17143
+LicenseClient-escha
 -job-worker-count
-3
+5
 -background-job-worker-count
 8
 -gc-helper-count
 1
 -name
 AssetImport
-Successfully changed project path to: C:/Users/17143/Documents/GitHub/TacticalStrikeVR
-C:/Users/17143/Documents/GitHub/TacticalStrikeVR
+Successfully changed project path to: C:/Users/escha/OneDrive/Documents/GitHub/TacticalStrikeVR
+C:/Users/escha/OneDrive/Documents/GitHub/TacticalStrikeVR
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
     "memorysetup-bucket-allocator-granularity=16"
     "memorysetup-bucket-allocator-bucket-count=8"
@@ -65,29 +65,39 @@ C:/Users/17143/Documents/GitHub/TacticalStrikeVR
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gfx=262144"
-Player connection [24548]  Target information:
+Player connection [17560]  Target information:
 
-Player connection [24548]  * "[IP] 172.27.144.1 [Port] 0 [Flags] 2 [Guid] 3943061830 [EditorId] 3943061830 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-M7STBP1I) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+Player connection [17560]  * "[IP] 192.168.56.1 [Port] 0 [Flags] 2 [Guid] 2381877306 [EditorId] 2381877306 [Version] 1048832 [Id] WindowsEditor(7,EmCompute) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
 
-Player connection [24548]  * "[IP] 172.24.123.169 [Port] 0 [Flags] 2 [Guid] 3943061830 [EditorId] 3943061830 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-M7STBP1I) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+Player connection [17560]  * "[IP] 172.22.112.1 [Port] 0 [Flags] 2 [Guid] 2381877306 [EditorId] 2381877306 [Version] 1048832 [Id] WindowsEditor(7,EmCompute) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
 
-Player connection [24548] Host joined multi-casting on [225.0.0.222:54997]...
-Player connection [24548] Host joined alternative multi-casting on [225.0.0.222:34997]...
-JobSystem: Creating JobQueue using job-worker-count value 3
+Player connection [17560]  * "[IP] 172.24.53.247 [Port] 0 [Flags] 2 [Guid] 2381877306 [EditorId] 2381877306 [Version] 1048832 [Id] WindowsEditor(7,EmCompute) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [17560] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [17560] Host joined alternative multi-casting on [225.0.0.222:34997]...
+JobSystem: Creating JobQueue using job-worker-count value 5
 Input System module state changed to: Initialized.
 [Physics::Module] Initialized fallback backend.
 [Physics::Module] Id: 0xdecafbad
-[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 20440, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 3680, path: "C:/Users/escha/Documents/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Error: HandshakeResponse reported an error:
+	ResponseCode: 505
+	ResponseStatus: Unsupported protocol version '1.17.2'.
+[Licensing::Module] Error: Failed to handshake to channel: "LicenseClient-escha"
+[Licensing::IpcConnector] LicenseClient-escha channel disconnected successfully.
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-escha-6000.0.62" at "2026-02-10T18:26:59.6181088Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 18424, path: "C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
 [Licensing::Module] LicensingClient has failed validation; ignoring
 [Licensing::Client] Handshaking with LicensingClient:
-  Version:                 1.17.3+a4e98f1
-  Session Id:              ba698cf3e8324c21a1f601337a87dab3
-  Correlation Id:          eb54b11eb75ce6a1f61343b8365fefea
-  External correlation Id: 7234620051061682339
-  Machine Id:              h7ZFEDGlMeG3tdDros9wkITRJA4=
-[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-17143" (connect: 0.00s, validation: 0.00s, handshake: 0.19s)
-[Licensing::IpcConnector] Successfully connected to: "LicenseClient-17143-notifications" at "2026-02-03T20:18:32.2088232Z"
-[Licensing::Module] Licensing Background thread has ended after 0.20s
+  Version:                 1.17.2+ff71f16
+  Session Id:              e32d49d960314e5587113e9efbcd1566
+  Correlation Id:          70b2b6f679ac744db3df740836fe564a
+  External correlation Id: 7159529061733108210
+  Machine Id:              g7NAe3wUmQazOUAKXwzY3wXRArg=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-escha-6000.0.62" (connect: 0.00s, validation: 0.00s, handshake: 0.01s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-escha-6000.0.62-notifications" at "2026-02-10T18:26:59.6324934Z"
+[Licensing::Module] Licensing Background thread has ended after 0.36s
 Library Redirect Path: Library/
 [Physics::Module] Selected backend.
 [Physics::Module] Name: PhysX
@@ -95,59 +105,68 @@ Library Redirect Path: Library/
 [Physics::Module] SDK Version: 4.1.2
 [Physics::Module] Integration Version: 1.0.0
 [Physics::Module] Threading Mode: Multi-Threaded
-Refreshing native plugins compatible for Editor in 74.31 ms, found 14 plugins.
-Preloading 1 native plugins for Editor in 4.87 ms.
+Refreshing native plugins compatible for Editor in 3393.22 ms, found 14 plugins.
+Preloading 1 native plugins for Editor in 1.50 ms.
 Initialize engine version: 6000.0.62f1 (f99f05b3e950)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path C:/Users/17143/Documents/GitHub/TacticalStrikeVR/Assets
+[Subsystems] Discovering subsystems at path C:/Users/escha/OneDrive/Documents/GitHub/TacticalStrikeVR/Assets
 GfxDevice: creating device client; kGfxThreadingModeNonThreaded
 Direct3D:
     Version:  Direct3D 11.0 [level 11.1]
-    Renderer: Intel(R) UHD Graphics (ID=0x9b41)
+    Renderer: Intel(R) Iris(R) Xe Graphics (ID=0x46a8)
     Vendor:   Intel
-    VRAM:     6060 MB
-    Driver:   27.20.100.9664
+    VRAM:     8026 MB
+    Driver:   32.0.101.5542
 Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56940
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56812
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.009421 seconds.
-- Loaded All Assemblies, in  0.804 seconds
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 1375163018539-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+Register platform support module: C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.896777 seconds.
+- Loaded All Assemblies, in 28.221 seconds
+Native extension for Android target not found
+Android Extension - Scanning For ADB Devices 544 ms
 Native extension for WindowsStandalone target not found
 Mono: successfully reloaded assembly
-- Finished resetting the current domain, in  1.051 seconds
-Domain Reload Profiling: 1850ms
-	BeginReloadAssembly (267ms)
+- Finished resetting the current domain, in  1.314 seconds
+Domain Reload Profiling: 29528ms
+	BeginReloadAssembly (21572ms)
 		ExecutionOrderSort (0ms)
 		DisableScriptedObjects (0ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
-		CreateAndSetChildDomain (2ms)
-	RebuildCommonClasses (79ms)
-	RebuildNativeTypeToScriptingClass (26ms)
-	initialDomainReloadingComplete (113ms)
-	LoadAllAssembliesAndSetupDomain (312ms)
-		LoadAssemblies (259ms)
+		CreateAndSetChildDomain (1ms)
+	RebuildCommonClasses (1420ms)
+	RebuildNativeTypeToScriptingClass (17ms)
+	initialDomainReloadingComplete (991ms)
+	LoadAllAssembliesAndSetupDomain (4214ms)
+		LoadAssemblies (21584ms)
 		RebuildTransferFunctionScriptingTraits (0ms)
-		AnalyzeDomain (307ms)
-			TypeCache.Refresh (304ms)
-				TypeCache.ScanAssembly (278ms)
+		AnalyzeDomain (4191ms)
+			TypeCache.Refresh (4189ms)
+				TypeCache.ScanAssembly (3388ms)
 			BuildScriptInfoCaches (0ms)
 			ResolveRequiredComponents (1ms)
-	FinalizeReload (1052ms)
+	FinalizeReload (1315ms)
 		ReleaseScriptCaches (0ms)
 		RebuildScriptCaches (0ms)
-		SetupLoadedEditorAssemblies (924ms)
+		SetupLoadedEditorAssemblies (1245ms)
 			LogAssemblyErrors (0ms)
-			InitializePlatformSupportModulesInManaged (48ms)
-			SetLoadedEditorAssemblies (9ms)
-			BeforeProcessingInitializeOnLoad (189ms)
-			ProcessInitializeOnLoadAttributes (495ms)
-			ProcessInitializeOnLoadMethodAttributes (184ms)
+			InitializePlatformSupportModulesInManaged (701ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (143ms)
+			ProcessInitializeOnLoadAttributes (287ms)
+			ProcessInitializeOnLoadMethodAttributes (107ms)
 			AfterProcessingInitializeOnLoad (0ms)
 			EditorAssembliesLoaded (0ms)
 		ExecutionOrderSort2 (0ms)
@@ -157,18 +176,9 @@ Worker process is ready to serve import requests
 Import Worker Mode flag is 0x00
 Begin MonoManager ReloadAssembly
 [Licensing::Client] Successfully resolved entitlement details
-[Licensing::Module] License group:
-  Id: F4-WS5S-AFN3-A7U9-22NS-XXXX
-  Product: Unity Personal
-  Type: ULF
-  Expiration: Unlimited
-[Licensing::Module] License group:
-  Id: 2475288780437-UnityPersXXXX
-  Product: Unity Personal
-  Type: Assigned
-  Expiration: Unlimited
-- Loaded All Assemblies, in  3.151 seconds
-Refreshing native plugins compatible for Editor in 50.59 ms, found 14 plugins.
+- Loaded All Assemblies, in 48.329 seconds
+Refreshing native plugins compatible for Editor in 386.50 ms, found 14 plugins.
+Native extension for Android target not found
 Native extension for WindowsStandalone target not found
 Package Manager log level set to [2]
 [Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
@@ -198,39 +208,39 @@ Mono: successfully reloaded assembly
 [Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
 [Package Manager] Unable to send message (not connected to server process).
 [Package Manager] Cannot connect to Unity Package Manager local server
-- Finished resetting the current domain, in  2.715 seconds
-Domain Reload Profiling: 5838ms
-	BeginReloadAssembly (759ms)
+- Finished resetting the current domain, in  2.273 seconds
+Domain Reload Profiling: 50585ms
+	BeginReloadAssembly (16333ms)
 		ExecutionOrderSort (0ms)
-		DisableScriptedObjects (31ms)
+		DisableScriptedObjects (17ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
-		CreateAndSetChildDomain (108ms)
-	RebuildCommonClasses (166ms)
-	RebuildNativeTypeToScriptingClass (71ms)
-	initialDomainReloadingComplete (164ms)
-	LoadAllAssembliesAndSetupDomain (1961ms)
-		LoadAssemblies (1293ms)
+		CreateAndSetChildDomain (49ms)
+	RebuildCommonClasses (62ms)
+	RebuildNativeTypeToScriptingClass (18ms)
+	initialDomainReloadingComplete (69ms)
+	LoadAllAssembliesAndSetupDomain (31829ms)
+		LoadAssemblies (45967ms)
 		RebuildTransferFunctionScriptingTraits (0ms)
-		AnalyzeDomain (1072ms)
-			TypeCache.Refresh (787ms)
-				TypeCache.ScanAssembly (719ms)
-			BuildScriptInfoCaches (238ms)
-			ResolveRequiredComponents (39ms)
-	FinalizeReload (2716ms)
+		AnalyzeDomain (2036ms)
+			TypeCache.Refresh (1904ms)
+				TypeCache.ScanAssembly (1877ms)
+			BuildScriptInfoCaches (108ms)
+			ResolveRequiredComponents (17ms)
+	FinalizeReload (2274ms)
 		ReleaseScriptCaches (0ms)
 		RebuildScriptCaches (0ms)
-		SetupLoadedEditorAssemblies (2398ms)
+		SetupLoadedEditorAssemblies (1997ms)
 			LogAssemblyErrors (0ms)
-			InitializePlatformSupportModulesInManaged (4ms)
-			SetLoadedEditorAssemblies (10ms)
-			BeforeProcessingInitializeOnLoad (467ms)
-			ProcessInitializeOnLoadAttributes (1629ms)
-			ProcessInitializeOnLoadMethodAttributes (272ms)
+			InitializePlatformSupportModulesInManaged (20ms)
+			SetLoadedEditorAssemblies (5ms)
+			BeforeProcessingInitializeOnLoad (251ms)
+			ProcessInitializeOnLoadAttributes (1507ms)
+			ProcessInitializeOnLoadMethodAttributes (198ms)
 			AfterProcessingInitializeOnLoad (15ms)
 			EditorAssembliesLoaded (1ms)
 		ExecutionOrderSort2 (0ms)
-		AwakeInstancesAfterBackupRestoration (11ms)
+		AwakeInstancesAfterBackupRestoration (10ms)
 WARNING: Shader Unsupported: 'Hidden/Simulation/URP/Synthetic' - All subshaders removed
 WARNING: Shader Did you use #pragma only_renderers and omit this platform?
 WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
@@ -267,13 +277,361 @@ WARNING: Shader If subshaders removal was intentional, you may have forgotten tu
 WARNING: Shader Unsupported: 'Simulation/Room X-Ray' - All subshaders removed
 WARNING: Shader Did you use #pragma only_renderers and omit this platform?
 WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.02 seconds
-Refreshing native plugins compatible for Editor in 41.26 ms, found 14 plugins.
-Preloading 1 native plugins for Editor in 0.15 ms.
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.08 seconds
+Refreshing native plugins compatible for Editor in 27.96 ms, found 14 plugins.
+Preloading 1 native plugins for Editor in 0.13 ms.
 Unloading 38 Unused Serialized files (Serialized files now loaded: 0)
-Unloading 7614 unused Assets / (8.1 MB). Loaded Objects now: 8141.
-Memory consumption went from 128.6 MB to 120.4 MB.
-Total: 25.815700 ms (FindLiveObjects: 2.273300 ms CreateObjectMapping: 2.497600 ms MarkObjects: 11.266300 ms  DeleteObjects: 9.772200 ms)
+Unloading 7615 unused Assets / (6.9 MB). Loaded Objects now: 8144.
+Memory consumption went from 131.0 MB to 124.1 MB.
+Total: 17.378000 ms (FindLiveObjects: 1.210400 ms CreateObjectMapping: 1.413300 ms MarkObjects: 8.350800 ms  DeleteObjects: 6.401400 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 132591.728855 seconds.
+  path: Assets/Fantasy knight/Base mesh/Separated_mesh/Body_01.fbx
+  artifactKey: Guid(f3cbb9c2b4248aa4aac44577525b443c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Separated_mesh/Body_01.fbx using Guid(f3cbb9c2b4248aa4aac44577525b443c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '2bb1a4face0115975d457a2d04d1c069') in 1.9930934 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 137
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000066 seconds.
+  path: Assets/Fantasy knight/Base mesh/Separated_mesh/Body_02.fbx
+  artifactKey: Guid(0f5da6fe2c601ad46a8c8703f3659174) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Separated_mesh/Body_02.fbx using Guid(0f5da6fe2c601ad46a8c8703f3659174) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f83072efa0e4b4070f844d3cee017f03') in 0.1294213 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 137
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000103 seconds.
+  path: Assets/Fantasy knight/Base mesh/Separated_mesh/Bracers.fbx
+  artifactKey: Guid(5dabcd0974f9098449183d2b966a1ec6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Separated_mesh/Bracers.fbx using Guid(5dabcd0974f9098449183d2b966a1ec6) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '43cc6965608e712fd6efc0989d2ef9ed') in 0.6204765 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 138
+
+========================================================================
+Received Import Request.
+  Time since last request: 131.017669 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EMP Tower/EMP_Tower_level_1_Shadow.fbx
+  artifactKey: Guid(779bf64d18fe54a7b9035172378af80c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EMP Tower/EMP_Tower_level_1_Shadow.fbx using Guid(779bf64d18fe54a7b9035172378af80c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '88a3348558c5fb113b1e62bab52444b9') in 0.0761774 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001216 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EMP Tower/EMP_Tower_level_3.fbx
+  artifactKey: Guid(220c2363b8fb44e4287e83ab206d82d5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EMP Tower/EMP_Tower_level_3.fbx using Guid(220c2363b8fb44e4287e83ab206d82d5) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '0fb265c568573688198ccf68fbd7d3e6') in 0.0851122 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 8
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.830819 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L01_Shadow.fbx
+  artifactKey: Guid(eae20296c1c9b4145bb345e04a908cfc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L01_Shadow.fbx using Guid(eae20296c1c9b4145bb345e04a908cfc) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '514e9db29bb09f63e7587c369a1ee249') in 0.0339145 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000220 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L03.fbx
+  artifactKey: Guid(de71096fe1f7240cdbd41d7a05a18524) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L03.fbx using Guid(de71096fe1f7240cdbd41d7a05a18524) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '192bd1a5c4acbc9f3ef0f2e1c8850a25') in 0.0434262 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 11
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000028 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_1_COL.fbx
+  artifactKey: Guid(7d5b20c8a4bb94a7faea8717dd4aced1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_1_COL.fbx using Guid(7d5b20c8a4bb94a7faea8717dd4aced1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c63619c00814164b01afe09ec3a857c9') in 0.0319556 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000022 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_2.fbx
+  artifactKey: Guid(c0acb67cc67044ec792123c78a445c25) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_2.fbx using Guid(c0acb67cc67044ec792123c78a445c25) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'fabbf7e9844b2f2ab3c8533ba0f36b5d') in 0.1612845 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 44
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000039 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_2_COL.fbx
+  artifactKey: Guid(8fb585f7e9d4c49219e693a26a303efd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_2_COL.fbx using Guid(8fb585f7e9d4c49219e693a26a303efd) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'd6b43544f2ebb51d43bfecb81046c9d4') in 0.0395455 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000081 seconds.
+  path: Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Rusty_Shiv.fbx
+  artifactKey: Guid(7c5b40b453add634a8ba08f42a40ce41) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Rusty_Shiv.fbx using Guid(7c5b40b453add634a8ba08f42a40ce41) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f0db61199eed46342f4837afdaedab7c') in 0.0560698 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000027 seconds.
+  path: Assets/Fantasy knight/Base mesh/Separated_mesh/Gloves.fbx
+  artifactKey: Guid(deb22067e8e1fad47a68af5f892b15a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Separated_mesh/Gloves.fbx using Guid(deb22067e8e1fad47a68af5f892b15a8) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'dbba01697ecf7a8cd19a9eae2f4288b9') in 0.2792723 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 138
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.002423 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_BASE_L03_Shadow.fbx
+  artifactKey: Guid(2cae8e904154e4fff85163cc3c6f4180) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_BASE_L03_Shadow.fbx using Guid(2cae8e904154e4fff85163cc3c6f4180) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '0618e164c9c8096b282be454b6ae6513') in 0.090395 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000812 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter_Shadow.fbx
+  artifactKey: Guid(25a881f6998a247a5ab71b289546cae0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter_Shadow.fbx using Guid(25a881f6998a247a5ab71b289546cae0) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '7bb4867767c62b2f7ca40e5c5a30e6b1') in 0.0751103 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000908 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Base_Shadow.fbx
+  artifactKey: Guid(dda571f6dbd694b2b9ef9e97209dd450) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Base_Shadow.fbx using Guid(dda571f6dbd694b2b9ef9e97209dd450) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3b12000f9f25945a3b9b9b3c36a904ef') in 0.0434015 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000056 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_TURRET_L02_Shadow.fbx
+  artifactKey: Guid(cd4aa88c43e9b4a008ef41890d804843) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_TURRET_L02_Shadow.fbx using Guid(cd4aa88c43e9b4a008ef41890d804843) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'e536d01e503cca6061931371bf83e59c') in 0.0586761 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000871 seconds.
+  path: Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Notched_Shortsword.fbx
+  artifactKey: Guid(eb3eeaed8ca9b2f46a107d45441b61f7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Notched_Shortsword.fbx using Guid(eb3eeaed8ca9b2f46a107d45441b61f7) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'bb687778bae3c25e0e3512bfa3b6a00a') in 0.0609714 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000035 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Player/HeadQuarters.fbx
+  artifactKey: Guid(71168782495474ac69411fd475ef70e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Player/HeadQuarters.fbx using Guid(71168782495474ac69411fd475ef70e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '0ae763b05ba513d38d3dec4390bed19c') in 0.0714893 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000053 seconds.
+  path: Assets/Fantasy knight/Base mesh/Separated_mesh/Helmet.fbx
+  artifactKey: Guid(084eec089e3461c459cd95f2a3281fc6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Separated_mesh/Helmet.fbx using Guid(084eec089e3461c459cd95f2a3281fc6) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f4b6a9f3176a14f154d210bb4a496b2c') in 0.2089502 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 138
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000069 seconds.
+  path: Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Arrow.fbx
+  artifactKey: Guid(2ecd1f994a3c50644ae8679df96908f5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Arrow.fbx using Guid(2ecd1f994a3c50644ae8679df96908f5) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '9c2a557d91f29c8fed64ab4acbea57d9') in 0.1020013 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000044 seconds.
+  path: Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Recurve_Shortbow.fbx
+  artifactKey: Guid(57d2b097b12008448a7c14fc7473a232) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Weapons/Goblin_Weapon_Recurve_Shortbow.fbx using Guid(57d2b097b12008448a7c14fc7473a232) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f637e4d02337bde37b33b9025161b608') in 0.1045688 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 14
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000133 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Base.fbx
+  artifactKey: Guid(845f9df773be94e26aa80e92ad483534) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Base.fbx using Guid(845f9df773be94e26aa80e92ad483534) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '5ded88a9bd388a85a9f75f30fd7536f9') in 0.1411368 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 12
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.002329 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L03_Shadow.fbx
+  artifactKey: Guid(d364d4a5494f9466b8d3596f900afd8c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L03_Shadow.fbx using Guid(d364d4a5494f9466b8d3596f900afd8c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '655406affb692390cedfa08da21e4220') in 0.0853303 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.033189 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Turret.fbx
+  artifactKey: Guid(989fb7eab843640c7ada0607778bcf7e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/HoverTank_Turret.fbx using Guid(989fb7eab843640c7ada0607778bcf7e) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1e53fac0ad519c9e61c36678be70c970') in 0.1030399 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 10
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000043 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L02.fbx
+  artifactKey: Guid(9f90d0f5966744c19881d6ddebe87a58) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/EnergyPylon/EnergyPylon_L02.fbx using Guid(9f90d0f5966744c19881d6ddebe87a58) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '90e46a08de54a1b64ea1bcdb91ab86e5') in 0.1208973 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 11
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000046 seconds.
+  path: Assets/Bublik/Simple Modular Castle Assets/Meshes/Lumber_Mill.fbx
+  artifactKey: Guid(31b9ca7d2e7e1094095264d59801e1c1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Bublik/Simple Modular Castle Assets/Meshes/Lumber_Mill.fbx using Guid(31b9ca7d2e7e1094095264d59801e1c1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter)Material 'Color' with Shader 'Simulation/URP/Lit' doesn't have a float or range property '_Mode'
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.Material:GetFloatImpl (int)
+UnityEngine.Material:GetFloat (string)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:SyncWithLegacyValues (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:191)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:ValidateMaterial (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:54)
+UnityEditor.ShaderGUIUtility:ValidateMaterial (UnityEngine.Material)
+UnityEngine.Camera:Render ()
+UnityEditor.PreviewRenderUtility:Render (bool,bool)
+UnityEditor.GameObjectInspector:DoRenderPreview (UnityEditor.GameObjectInspector/PreviewData)
+UnityEditor.GameObjectInspector:RenderStaticPreview (string,UnityEngine.Object[],int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreview (UnityEngine.Object,UnityEngine.Object[],string,int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreviewForAsset (UnityEngine.Object,UnityEngine.Object[],string)
+
+[./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs line 191]
+
+Material 'Color' with Shader 'Simulation/URP/Lit' doesn't have a float or range property '_Mode'
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.Material:GetFloatImpl (int)
+UnityEngine.Material:GetFloat (string)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:SyncWithLegacyValues (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:194)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:ValidateMaterial (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:54)
+UnityEditor.ShaderGUIUtility:ValidateMaterial (UnityEngine.Material)
+UnityEngine.Camera:Render ()
+UnityEditor.PreviewRenderUtility:Render (bool,bool)
+UnityEditor.GameObjectInspector:DoRenderPreview (UnityEditor.GameObjectInspector/PreviewData)
+UnityEditor.GameObjectInspector:RenderStaticPreview (string,UnityEngine.Object[],int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreview (UnityEngine.Object,UnityEngine.Object[],string,int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreviewForAsset (UnityEngine.Object,UnityEngine.Object[],string)
+
+[./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs line 194]
+
+Material 'Gray_Gradient' with Shader 'Simulation/URP/Lit' doesn't have a float or range property '_Mode'
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.Material:GetFloatImpl (int)
+UnityEngine.Material:GetFloat (string)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:SyncWithLegacyValues (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:191)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:ValidateMaterial (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:54)
+UnityEditor.ShaderGUIUtility:ValidateMaterial (UnityEngine.Material)
+UnityEngine.Camera:Render ()
+UnityEditor.PreviewRenderUtility:Render (bool,bool)
+UnityEditor.GameObjectInspector:DoRenderPreview (UnityEditor.GameObjectInspector/PreviewData)
+UnityEditor.GameObjectInspector:RenderStaticPreview (string,UnityEngine.Object[],int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreview (UnityEngine.Object,UnityEngine.Object[],string,int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreviewForAsset (UnityEngine.Object,UnityEngine.Object[],string)
+
+[./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs line 191]
+
+Material 'Gray_Gradient' with Shader 'Simulation/URP/Lit' doesn't have a float or range property '_Mode'
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.Material:GetFloatImpl (int)
+UnityEngine.Material:GetFloat (string)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:SyncWithLegacyValues (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:194)
+UnityEditor.XR.Simulation.Rendering.MaterialInspector:ValidateMaterial (UnityEngine.Material) (at ./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs:54)
+UnityEditor.ShaderGUIUtility:ValidateMaterial (UnityEngine.Material)
+UnityEngine.Camera:Render ()
+UnityEditor.PreviewRenderUtility:Render (bool,bool)
+UnityEditor.GameObjectInspector:DoRenderPreview (UnityEditor.GameObjectInspector/PreviewData)
+UnityEditor.GameObjectInspector:RenderStaticPreview (string,UnityEngine.Object[],int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreview (UnityEngine.Object,UnityEngine.Object[],string,int,int)
+UnityEditor.AssetPreviewUpdater:CreatePreviewForAsset (UnityEngine.Object,UnityEngine.Object[],string)
+
+[./Library/PackageCache/com.unity.xr.arfoundation@632379b1f7b5/Editor/Simulation/Rendering/MaterialInspector.cs line 194]
+
+ -> (artifact id: '790cdf38dca93403fd31231d4766a679') in 0.2876084 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 19
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000065 seconds.
+  path: Assets/Fantasy knight/Base mesh/Mace.fbx
+  artifactKey: Guid(afbecd5bd7bdf5645939b6778b81260a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Fantasy knight/Base mesh/Mace.fbx using Guid(afbecd5bd7bdf5645939b6778b81260a) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'a4bbf72f00ba6914fbeb21ad52c1625b') in 0.9240723 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 12
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000052 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_4.fbx
+  artifactKey: Guid(87e47e3172ee14b53a135e99633fe791) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_4.fbx using Guid(87e47e3172ee14b53a135e99633fe791) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'e7e852a2df6b031e4eb4a757083ecc42') in 0.5560106 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 89
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000061 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_4_COL.fbx
+  artifactKey: Guid(ae0df43d824ba4648821b8b7bea6a956) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_4_COL.fbx using Guid(ae0df43d824ba4648821b8b7bea6a956) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '39aff1b8d31b4815d774d24751e855e0') in 0.0752281 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 9
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000156 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter_FX_Cones.fbx
+  artifactKey: Guid(8e6e6f20a4c004c14882d03b06b6d349) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter_FX_Cones.fbx using Guid(8e6e6f20a4c004c14882d03b06b6d349) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1e1014617219d43df346942f517d312c') in 0.0506731 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 9
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000799 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter.fbx
+  artifactKey: Guid(990dec5933dcb4fcc964d597b2b43970) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Units/Helicopter.fbx using Guid(990dec5933dcb4fcc964d597b2b43970) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '4b628e653c9f0403883e7acbfef6b9a4') in 0.0731046 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000170 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_TURRET_L01_Shadow.fbx
+  artifactKey: Guid(5264b22d57d4e4c9c9caec9d8b65452c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_TURRET_L01_Shadow.fbx using Guid(5264b22d57d4e4c9c9caec9d8b65452c) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '4c26a4b453c0cd0e38919aefb1f95776') in 0.0474955 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000225 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_3_COL.fbx
+  artifactKey: Guid(3584259b38f3647699aa52084d205a3e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Levels/Enviro_Level_3_COL.fbx using Guid(3584259b38f3647699aa52084d205a3e) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f9fe61ca1031774b4c1a692004f7c426') in 0.0519264 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.030762 seconds.
+  path: Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_BASE_L02_Shadow.fbx
+  artifactKey: Guid(943e4e2635b824286b03c4d819c3c0b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/UnityTechnologies/TowerDefenseTemplate/Models/Towers/Laser/LaserTower_BASE_L02_Shadow.fbx using Guid(943e4e2635b824286b03c4d819c3c0b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '941ecffda7137b93b8dfd6dfe5395aa3') in 0.0766218 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 7
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000190 seconds.
+  path: Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Chatacters/Goblin_Warrior.fbx
+  artifactKey: Guid(1411808199387564bb161735d6b0a619) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Standout7/LOWPO_Goblin_Pack/Meshes/Chatacters/Goblin_Warrior.fbx using Guid(1411808199387564bb161735d6b0a619) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'cb566a83aff6fd3916da41c3ba019706') in 0.3228551 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
 
 Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
 AssetImportWorker is now disconnected from the server
