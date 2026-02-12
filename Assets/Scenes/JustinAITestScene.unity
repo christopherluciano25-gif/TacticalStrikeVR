@@ -1980,8 +1980,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridMode: 0
-  gridRows: 9
-  gridColumns: 9
+  gridRows: 8
+  gridColumns: 8
   areaStart: {x: 5, y: 0, z: -45}
   areaEnd: {x: 95, y: 0, z: 45}
   lockYAxis: 1
