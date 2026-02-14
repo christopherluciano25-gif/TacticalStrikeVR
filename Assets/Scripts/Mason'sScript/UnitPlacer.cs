@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// VR placement system using Unity XR Input (works with Quest Link)
 /// Right controller raycast for placement
 /// Trigger: place unit
-/// Grip: rotate wall/tower
+/// Grip: rotate wall (only walls can rotate, toggles between vertical and horizontal)
 /// </summary>
 public class UnitPlacer : MonoBehaviour
 {
@@ -32,6 +32,9 @@ public class UnitPlacer : MonoBehaviour
     [SerializeField] private bool showPreview = true;
     [SerializeField] private float previewAlpha = 0.5f;
 
+    [Header("Rotation Settings")]
+    [SerializeField][Range(0.1f, 1.0f)] private float rotationCooldown = 0.3f;
+
     [Header("Debug")]
     [SerializeField] private bool verboseLogging = true;
 
@@ -52,6 +55,9 @@ public class UnitPlacer : MonoBehaviour
     // Input devices
     private InputDevice rightHandDevice;
     private bool rightHandFound = false;
+
+    // Rotation cooldown
+    private float lastRotationTime = 0f;
 
     private void Awake()
     {
@@ -145,7 +151,7 @@ public class UnitPlacer : MonoBehaviour
         else
         {
             rightHandFound = false;
-            if (Time.frameCount % 120 == 0) // Log every 2 seconds
+            if (Time.frameCount % 120 == 0)
             {
                 Debug.LogWarning("[UnitPlacer] No right hand controller found!");
             }
@@ -194,7 +200,7 @@ public class UnitPlacer : MonoBehaviour
         currentUnitType = unitType;
         currentWidth = width;
         currentHeight = height;
-        currentRotation = RotationAngle.Rotate0;
+        currentRotation = RotationAngle.Rotate0; // Always start at 0°
         isPlacementMode = true;
 
         CreatePreview();
@@ -311,15 +317,27 @@ public class UnitPlacer : MonoBehaviour
     {
         if (!rightHandFound) return;
 
+        // FIXED: Only walls can rotate
+        if (currentUnitType != UnitType.Wall)
+        {
+            return; // Knights and towers can't rotate
+        }
+
+        // Check cooldown timer
+        if (Time.time - lastRotationTime < rotationCooldown)
+        {
+            return; // Still in cooldown
+        }
+
         // Get grip button press
         if (rightHandDevice.TryGetFeatureValue(CommonUsages.gripButton, out bool gripPressed))
         {
-            // Check for button down (wasn't pressed last frame, is pressed this frame)
             rightHandDevice.TryGetFeatureValue(CommonUsages.grip, out float gripValue);
 
             if (gripPressed && gripValue > 0.9f)
             {
                 RotatePreview();
+                lastRotationTime = Time.time;
                 Debug.Log("[UnitPlacer] GRIP PRESSED - Rotating!");
             }
         }
@@ -351,27 +369,26 @@ public class UnitPlacer : MonoBehaviour
 
     private void RotatePreview()
     {
-        switch (currentRotation)
+        // FIXED: Only toggle between 0° and 90° for walls
+        // 0° = vertical (extends in Z direction, up on grid)
+        // 90° = horizontal (extends in X direction, right on grid)
+
+        if (currentRotation == RotationAngle.Rotate0)
         {
-            case RotationAngle.Rotate0:
-                currentRotation = RotationAngle.Rotate90;
-                break;
-            case RotationAngle.Rotate90:
-                currentRotation = RotationAngle.Rotate180;
-                break;
-            case RotationAngle.Rotate180:
-                currentRotation = RotationAngle.Rotate270;
-                break;
-            case RotationAngle.Rotate270:
-                currentRotation = RotationAngle.Rotate0;
-                break;
+            currentRotation = RotationAngle.Rotate90;
+        }
+        else
+        {
+            currentRotation = RotationAngle.Rotate0;
         }
 
         Debug.Log($"[UnitPlacer] ✓ Rotated to {currentRotation}");
 
         if (previewObject != null)
         {
-            previewObject.transform.rotation = Quaternion.Euler(0f, (float)currentRotation, 0f);
+            float baseRotation = (currentUnitType == UnitType.Wall) ? 90f : 0f;
+            float finalRotation = (baseRotation + (float)currentRotation) % 360f;
+            previewObject.transform.rotation = Quaternion.Euler(0f, finalRotation, 0f);
         }
 
         UpdateHoverCell(currentHoverCell);
@@ -403,8 +420,9 @@ public class UnitPlacer : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPos = GetPlacementWorldPosition();
-        Quaternion spawnRot = Quaternion.Euler(0f, (float)currentRotation, 0f);
+        // FIXED: Get position and rotation from preview to match exactly
+        Vector3 spawnPos = previewObject != null ? previewObject.transform.position : GetPlacementWorldPosition();
+        Quaternion spawnRot = previewObject != null ? previewObject.transform.rotation : GetPlacementRotation();
 
         GameObject placedUnit = Instantiate(currentPrefab, spawnPos, spawnRot);
         placedUnit.name = $"{currentUnitType}_{currentHoverCell.gridX}_{currentHoverCell.gridZ}";
@@ -430,6 +448,14 @@ public class UnitPlacer : MonoBehaviour
             Destroy(placedUnit);
         }
     }
+
+    private Quaternion GetPlacementRotation()
+    {
+        float baseRotation = (currentUnitType == UnitType.Wall) ? 90f : 0f;
+        float finalRotation = (baseRotation + (float)currentRotation) % 360f;
+        return Quaternion.Euler(0f, finalRotation, 0f);
+    }
+
     private Vector3 GetPlacementWorldPosition()
     {
         if (currentHoverCell == null) return Vector3.zero;
@@ -443,37 +469,41 @@ public class UnitPlacer : MonoBehaviour
             rotatedHeight = currentWidth;
         }
 
-        float offsetX = (rotatedWidth - 1) * tacticalGrid.CellWidth / 2f;
-        float offsetZ = (rotatedHeight - 1) * tacticalGrid.CellHeight / 2f;
+        // Different placement logic per unit type
+        float offsetX = 0f;
+        float offsetZ = 0f;
+
+        // Center archer towers (2x2), place walls/knights from corner
+        if (currentUnitType == UnitType.ArcherTower)
+        {
+            offsetX = (rotatedWidth - 1) * tacticalGrid.CellWidth / 2f;
+            offsetZ = (rotatedHeight - 1) * tacticalGrid.CellHeight / 2f;
+        }
 
         Vector3 basePosition = currentHoverCell.worldPosition + new Vector3(offsetX, 0f, offsetZ);
 
-        // FIXED: Calculate Y offset from preview object if available
+        // Calculate Y offset to place bottom on grid
         float yOffset = 0f;
 
         GameObject objectToMeasure = previewObject != null ? previewObject : currentPrefab;
 
         if (objectToMeasure != null)
         {
-            // Get all renderers to calculate combined bounds
             Renderer[] renderers = objectToMeasure.GetComponentsInChildren<Renderer>();
 
             if (renderers.Length > 0)
             {
-                // Calculate combined bounds
                 Bounds combinedBounds = renderers[0].bounds;
                 for (int i = 1; i < renderers.Length; i++)
                 {
                     combinedBounds.Encapsulate(renderers[i].bounds);
                 }
 
-                // Offset by the minimum Y to place bottom at grid level
                 float minY = combinedBounds.min.y - objectToMeasure.transform.position.y;
-                yOffset = -minY; // Negate to move up
+                yOffset = -minY;
             }
         }
 
-        Debug.Log($"[UnitPlacer] Y Offset: {yOffset:F2}");
         return basePosition + new Vector3(0f, yOffset, 0f);
     }
 
@@ -510,7 +540,10 @@ public class UnitPlacer : MonoBehaviour
 
         Vector3 previewPos = GetPlacementWorldPosition();
         previewObject.transform.position = previewPos;
-        previewObject.transform.rotation = Quaternion.Euler(0f, (float)currentRotation, 0f);
+
+        float baseRotation = (currentUnitType == UnitType.Wall) ? 90f : 0f;
+        float finalRotation = (baseRotation + (float)currentRotation) % 360f;
+        previewObject.transform.rotation = Quaternion.Euler(0f, finalRotation, 0f);
 
         UpdatePreviewColor(isValidPlacement);
     }
@@ -522,16 +555,11 @@ public class UnitPlacer : MonoBehaviour
         {
             foreach (Material mat in r.materials)
             {
-                mat.SetFloat("_Mode", 3);
-                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                mat.SetInt("_ZWrite", 0);
-                mat.EnableKeyword("_ALPHABLEND_ON");
-                mat.renderQueue = 3000;
-
+                // Simple approach for transparency
                 Color c = mat.color;
                 c.a = previewAlpha;
                 mat.color = c;
+                mat.renderQueue = 3000;
             }
         }
     }

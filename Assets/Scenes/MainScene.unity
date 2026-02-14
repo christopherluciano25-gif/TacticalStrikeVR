@@ -3677,11 +3677,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPlacer: {fileID: 1556278493}
-  wallPrefab: {fileID: 4904430799933643664, guid: 036f1ce797094d544ae2b92467f479b8,
+  wallPrefab: {fileID: 4860641829804342151, guid: 6ba8befd0b23c6a4fbaa306c4052ae9c,
     type: 3}
-  knightPrefab: {fileID: 5602816410212262390, guid: aa626106e68cd374e9f0d04cff08abf0,
+  knightPrefab: {fileID: 5589287407327569736, guid: eacb577bd66c79d4a88715accd158b64,
     type: 3}
-  archerTowerPrefab: {fileID: 299609342130227487, guid: 2b9572dd266dda548a0d13e429fc3eb8,
+  archerTowerPrefab: {fileID: 3860644921391560158, guid: c256bfd515172044fa91785d9ba8c3d3,
     type: 3}
 --- !u!1 &1502606554
 GameObject:
@@ -3902,7 +3902,7 @@ MonoBehaviour:
     m_Bits: 8
   autoFindRightController: 1
   rightControllerTransform: {fileID: 1391057378}
-  maxRayDistance: 30
+  maxRayDistance: 200
   showRay: 1
   rayLine: {fileID: 0}
   validRayColor: {r: 0, g: 1, b: 0, a: 1}
@@ -3910,6 +3910,7 @@ MonoBehaviour:
   normalRayColor: {r: 0, g: 1, b: 1, a: 1}
   showPreview: 1
   previewAlpha: 0.5
+  verboseLogging: 1
 --- !u!1001 &1570035171
 PrefabInstance:
   m_ObjectHideFlags: 0
