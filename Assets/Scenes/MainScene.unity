@@ -3902,7 +3902,7 @@ MonoBehaviour:
     m_Bits: 8
   autoFindRightController: 1
   rightControllerTransform: {fileID: 1391057378}
-  maxRayDistance: 30
+  maxRayDistance: 200
   showRay: 1
   rayLine: {fileID: 0}
   validRayColor: {r: 0, g: 1, b: 0, a: 1}
@@ -3910,6 +3910,7 @@ MonoBehaviour:
   normalRayColor: {r: 0, g: 1, b: 1, a: 1}
   showPreview: 1
   previewAlpha: 0.5
+  verboseLogging: 1
 --- !u!1001 &1570035171
 PrefabInstance:
   m_ObjectHideFlags: 0
