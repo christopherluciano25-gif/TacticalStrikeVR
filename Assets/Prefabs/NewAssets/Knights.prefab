@@ -76,10 +76,39 @@ PrefabInstance:
     - target: {fileID: 5589287407327569736, guid: eacb577bd66c79d4a88715accd158b64,
         type: 3}
       propertyPath: m_Name
-      value: Knights Variant
+      value: Knights
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5589287407327569736, guid: eacb577bd66c79d4a88715accd158b64,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4152159371890431568}
   m_SourcePrefab: {fileID: 100100000, guid: eacb577bd66c79d4a88715accd158b64, type: 3}
+--- !u!1 &5611909647719991634 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5589287407327569736, guid: eacb577bd66c79d4a88715accd158b64,
+    type: 3}
+  m_PrefabInstance: {fileID: 31702630990540314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-4152159371890431568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5611909647719991634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 362cc4c98289e884bbced5d1e05ee5c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  moveSpeed: 2
+  attackDamage: 15
+  attackRange: 1.5
+  attackCooldown: 1
+  team: 1
+  grid: {fileID: 0}

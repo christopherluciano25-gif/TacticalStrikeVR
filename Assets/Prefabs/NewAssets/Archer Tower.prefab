@@ -150,7 +150,7 @@ PrefabInstance:
     - target: {fileID: 6169923891604023497, guid: 215808fb70571c044b513387edc14034,
         type: 3}
       propertyPath: m_Name
-      value: Stone_Tower Variant 1
+      value: Archer Tower
       objectReference: {fileID: 0}
     - target: {fileID: 6833132415094927987, guid: 215808fb70571c044b513387edc14034,
         type: 3}
@@ -211,8 +211,39 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4444548413527667089}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6169923891604023497, guid: 215808fb70571c044b513387edc14034,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5435406864348441988}
   m_SourcePrefab: {fileID: 100100000, guid: 215808fb70571c044b513387edc14034, type: 3}
+--- !u!1 &3860644921391560158 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6169923891604023497, guid: 215808fb70571c044b513387edc14034,
+    type: 3}
+  m_PrefabInstance: {fileID: 6920973862217014551}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-5435406864348441988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3860644921391560158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bc16d950cae5884c975a9b1e9eeb26b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 60
+  attackDamage: 20
+  attackRange: 8
+  attackCooldown: 1.5
+  arrowPrefab: {fileID: 0}
+  arrowSpawnPoint: {fileID: 0}
+  arrowSpeed: 15
+  team: 1
+  grid: {fileID: 0}
 --- !u!4 &4528392194784358244 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6833132415094927987, guid: 215808fb70571c044b513387edc14034,
