@@ -239,7 +239,8 @@ MonoBehaviour:
   attackDamage: 20
   attackRange: 8
   attackCooldown: 1.5
-  arrowPrefab: {fileID: 0}
+  arrowPrefab: {fileID: 9006326494138540442, guid: 1458079a16a66424db07df1ada348c87,
+    type: 3}
   arrowSpawnPoint: {fileID: 0}
   arrowSpeed: 15
   team: 1
