@@ -161,7 +161,7 @@ public class Archer : MonoBehaviour
         if (bomber != null) return bomber.team;
         
         BaseHealth baseHealth = obj.GetComponent<BaseHealth>();
-        if (baseHealth != null) return baseHealth.Owner;
+        if (baseHealth != null) return baseHealth.owner;
         
         return TeamSide.Neutral;
     }

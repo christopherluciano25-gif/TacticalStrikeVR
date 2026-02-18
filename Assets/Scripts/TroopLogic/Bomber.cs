@@ -153,7 +153,7 @@ public class Bomber : MonoBehaviour
         if (bomber != null) return bomber.team;
         
         BaseHealth baseHealth = obj.GetComponent<BaseHealth>();
-        if (baseHealth != null) return baseHealth.Owner;
+        if (baseHealth != null) return baseHealth.owner;
         
         WallHealth wallHealth = obj.GetComponent<WallHealth>();
         if (wallHealth != null) return wallHealth.Owner;

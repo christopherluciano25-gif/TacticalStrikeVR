@@ -6,6 +6,7 @@ using System.Collections;
 /// STRONG against: Bombers (2x damage)
 /// WEAK against: Archers (takes 2x damage)
 /// NEUTRAL against: Knights, Walls, Bases
+/// Walks forward if no enemies found
 /// </summary>
 public class Knight : MonoBehaviour
 {
@@ -55,6 +56,7 @@ public class Knight : MonoBehaviour
     
     /// <summary>
     /// Main AI loop - find target, move, attack
+    /// If no enemies: walk forward
     /// </summary>
     private IEnumerator AILoop()
     {
@@ -78,9 +80,14 @@ public class Knight : MonoBehaviour
                 }
                 else
                 {
-                    // Too far - move closer
+                    // Too far - move towards target
                     MoveTowards(currentTarget.transform.position);
                 }
+            }
+            else
+            {
+                // No enemies found - keep walking forward
+                MoveForward();
             }
             
             yield return new WaitForSeconds(0.1f); // Update 10 times per second
@@ -88,14 +95,13 @@ public class Knight : MonoBehaviour
     }
     
     /// <summary>
-    /// Find nearest enemy (prioritize: Bombers > Bases > Knights > Archers > Walls)
+    /// Find nearest enemy (based on distance, not priority)
     /// </summary>
     private GameObject FindNearestEnemy()
     {
         GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         GameObject nearestEnemy = null;
         float nearestDistance = Mathf.Infinity;
-        int highestPriority = -1;
         
         foreach (GameObject obj in allObjects)
         {
@@ -104,38 +110,18 @@ public class Knight : MonoBehaviour
             if (objTeam == TeamSide.Neutral || objTeam == team)
                 continue;
             
-            // Get priority (higher = more important target)
-            int priority = GetTargetPriority(obj);
+            // Calculate distance
             float distance = Vector3.Distance(transform.position, obj.transform.position);
             
-            // Choose target based on priority, then distance
-            if (priority > highestPriority || (priority == highestPriority && distance < nearestDistance))
+            // Choose closest target
+            if (distance < nearestDistance)
             {
                 nearestEnemy = obj;
                 nearestDistance = distance;
-                highestPriority = priority;
             }
         }
         
         return nearestEnemy;
-    }
-    
-    private int GetTargetPriority(GameObject obj)
-    {
-        // Knights prioritize bombers (strong against)
-        if (obj.GetComponent<Bomber>() != null) return 5; // Highest priority
-        
-        // Then bases (win condition)
-        if (obj.GetComponent<BaseHealth>() != null) return 4;
-        
-        // Then other knights
-        if (obj.GetComponent<Knight>() != null) return 3;
-        
-        // Then archers (we're weak against them, but still attack)
-        if (obj.GetComponent<Archer>() != null) return 2;
-        
-        // Walls/towers lowest priority
-        return 1;
     }
     
     private TeamSide GetObjectTeam(GameObject obj)
@@ -150,7 +136,10 @@ public class Knight : MonoBehaviour
         if (bomber != null) return bomber.team;
         
         BaseHealth baseHealth = obj.GetComponent<BaseHealth>();
-        if (baseHealth != null) return baseHealth.Owner;
+        if (baseHealth != null) return baseHealth.owner;
+        
+        WallHealth wallHealth = obj.GetComponent<WallHealth>();
+        if (wallHealth != null) return wallHealth.Owner; // Fixed: using instance property with capital O
         
         return TeamSide.Neutral;
     }
@@ -161,6 +150,8 @@ public class Knight : MonoBehaviour
     private void MoveTowards(Vector3 targetPos)
     {
         Vector3 direction = (targetPos - transform.position).normalized;
+        direction.y = 0; // Keep on ground
+        
         transform.position += direction * moveSpeed * Time.deltaTime;
         
         // Face movement direction
@@ -169,7 +160,35 @@ public class Knight : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction);
         }
         
-        // Update grid position
+        UpdateGridPosition();
+    }
+    
+    /// <summary>
+    /// Move forward when no enemies are found
+    /// Player units move towards +Z (bot side)
+    /// Bot units move towards -Z (player side)
+    /// </summary>
+    private void MoveForward()
+    {
+        Vector3 forwardDirection;
+        
+        if (team == TeamSide.Player)
+        {
+            forwardDirection = Vector3.forward; // Towards bot base
+        }
+        else
+        {
+            forwardDirection = Vector3.back; // Towards player base
+        }
+        
+        transform.position += forwardDirection * moveSpeed * Time.deltaTime;
+        
+        // Face movement direction
+        if (forwardDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(forwardDirection);
+        }
+        
         UpdateGridPosition();
     }
     
