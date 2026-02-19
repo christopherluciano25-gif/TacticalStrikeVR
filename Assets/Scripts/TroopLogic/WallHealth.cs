@@ -7,26 +7,26 @@ public class WallHealth : MonoBehaviour
     [SerializeField] private GameObject destroyEffectPrefab;
     
     [Header("Team")]
-    public TeamSide Owner = TeamSide.Player;
+    public TeamSide owner = TeamSide.Player; // Changed from Owner to owner (lowercase!)
     
     private float currentHealth;
     private bool isDestroyed = false;
+    
+    // Add this property for backwards compatibility
+    public TeamSide Owner => owner;
     
     private void Start()
     {
         currentHealth = maxHealth;
     }
     
-    /// <summary>
-    /// Take damage and potentially be destroyed
-    /// </summary>
     public void TakeDamage(float damage)
     {
         if (isDestroyed) return;
         
         currentHealth -= damage;
         
-        Debug.Log($"[Wall] {Owner} wall took {damage} damage. HP: {currentHealth}/{maxHealth}");
+        Debug.Log($"[Wall] {owner} wall took {damage} damage. HP: {currentHealth}/{maxHealth}");
         
         if (currentHealth <= 0)
         {
@@ -34,34 +34,26 @@ public class WallHealth : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Destroy this wall
-    /// </summary>
     private void DestroyWall()
     {
         if (isDestroyed) return;
         
         isDestroyed = true;
         
-        Debug.Log($"[Wall] {Owner} wall destroyed!");
+        Debug.Log($"[Wall] {owner} wall destroyed!");
         
-        // Spawn destruction effect
         if (destroyEffectPrefab != null)
         {
             Instantiate(destroyEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        // Destroy the wall object
+        // Remove from grid
+        TacticalGrid grid = FindObjectOfType<TacticalGrid>();
+        if (grid != null)
+        {
+            grid.RemoveUnit(this.gameObject);
+        }
+        
         Destroy(gameObject);
-    }
-    
-    /// <summary>
-    /// Optional: For debugging purposes
-    /// </summary>
-    private void OnDrawGizmos()
-    {
-        // Visualize wall health in editor
-        Gizmos.color = Color.gray;
-        Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
 }
