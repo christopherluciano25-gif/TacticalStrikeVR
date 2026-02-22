@@ -3334,6 +3334,54 @@ MonoBehaviour:
   _selectSurface: {fileID: 813230930}
   _movementProvider: {fileID: 0}
   _tiebreakerScore: 0
+--- !u!1 &1376014565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1376014567}
+  - component: {fileID: 1376014566}
+  m_Layer: 0
+  m_Name: Unit Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1376014566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376014565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 053d107c04f612f4eb1a19547c0fd2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allKnights: []
+  allArchers: []
+  allBases: []
+  allWalls: []
+--- !u!4 &1376014567
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376014565}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 22.559652, y: -6.432932, z: 39.385002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1382999907
 GameObject:
   m_ObjectHideFlags: 0
@@ -3805,7 +3853,7 @@ MonoBehaviour:
   unitPlacer: {fileID: 1556278493}
   wallPrefab: {fileID: 4860641829804342151, guid: 6ba8befd0b23c6a4fbaa306c4052ae9c,
     type: 3}
-  knightPrefab: {fileID: 5589287407327569736, guid: eacb577bd66c79d4a88715accd158b64,
+  knightPrefab: {fileID: 5611909647719991634, guid: b4302d132fafda849a4b1d1ebad7eb6d,
     type: 3}
   archerTowerPrefab: {fileID: 3860644921391560158, guid: c256bfd515172044fa91785d9ba8c3d3,
     type: 3}
@@ -5412,3 +5460,4 @@ SceneRoots:
   - {fileID: 1642012418}
   - {fileID: 545024791}
   - {fileID: 177397305}
+  - {fileID: 1376014567}
