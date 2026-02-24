@@ -4,28 +4,28 @@ public class TestBaseDamage : MonoBehaviour
 {
     void Update()
     {
-        // Press 1 to damage player base (test defeat)
+        // Press 1 to damage player base
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             DamageBase(TeamSide.Player, 100f);
         }
         
-        // Press 2 to damage bot base (test victory)
+        // Press 2 to damage bot base
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             DamageBase(TeamSide.Bot, 100f);
         }
         
-        // Press 3 to destroy player base instantly (game over)
+        // Press 3 to destroy player base (defeat)
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            DamageBase(TeamSide.Player, 9999f);
+            DestroyBase(TeamSide.Player);
         }
         
-        // Press 4 to destroy bot base instantly (victory)
+        // Press 4 to destroy bot base (victory)
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            DamageBase(TeamSide.Bot, 9999f);
+            DestroyBase(TeamSide.Bot);
         }
     }
     
@@ -39,6 +39,21 @@ public class TestBaseDamage : MonoBehaviour
             {
                 baseHealth.TakeDamage(damage);
                 Debug.Log($"Damaged {owner} base! HP: {baseHealth.CurrentHealth}/{baseHealth.MaxHealth}");
+                break;
+            }
+        }
+    }
+    
+    void DestroyBase(TeamSide owner)
+    {
+        BaseHealth[] bases = FindObjectsByType<BaseHealth>(FindObjectsSortMode.None);
+        
+        foreach (BaseHealth baseHealth in bases)
+        {
+            if (baseHealth.owner == owner)
+            {
+                baseHealth.TakeDamage(9999f);
+                Debug.Log($"Destroyed {owner} base!");
                 break;
             }
         }
