@@ -2959,7 +2959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 284953e528a70f040bfa394174c746c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 500
+  maxHealth: 100
   destroyEffectPrefab: {fileID: 0}
   owner: 2
 --- !u!65 &1144422025
@@ -5050,7 +5050,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 284953e528a70f040bfa394174c746c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 500
+  maxHealth: 100
   destroyEffectPrefab: {fileID: 0}
   owner: 1
 --- !u!65 &1862693139
