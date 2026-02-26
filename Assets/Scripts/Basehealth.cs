@@ -4,7 +4,7 @@ using System;
 public class BaseHealth : MonoBehaviour
 {
     [Header("Base Stats")]
-    [SerializeField] private float maxHealth = 500f;
+    [SerializeField] private float maxHealth = 200f;
     [SerializeField] private GameObject destroyEffectPrefab;
 
     [Header("Team")]
