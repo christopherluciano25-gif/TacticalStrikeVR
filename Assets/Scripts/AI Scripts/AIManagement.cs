@@ -2,15 +2,36 @@ using UnityEngine;
 
 public class AIManagement : MonoBehaviour
 {
+    [Header("Resources")]
     [SerializeField] private int maxResources = 5;
     [SerializeField] private float regenerationInterval = 5f; // Regenerate every 5 seconds
-    
+    [SerializeField] private int startingResources = 0;
+
+    [Header("AI Integration")]
+    [SerializeField] private TDEnemyPlayerAI enemyAI;
+    [SerializeField] private bool triggerBuildOnResourceGain = true;
+
     private int currentResources = 0;
     private float regenerationTimer = 0f;
 
+    private void Awake()
+    {
+        if (enemyAI == null)
+        {
+            enemyAI = FindObjectOfType<TDEnemyPlayerAI>();
+        }
+
+        currentResources = Mathf.Clamp(startingResources, 0, maxResources);
+    }
+
+    private void Start()
+    {
+        OnResourcesChanged();
+        TryTriggerAIBuild();
+    }
+
     private void Update()
     {
-        // Update regeneration timer in real-time during gameplay
         regenerationTimer += Time.deltaTime;
 
         if (regenerationTimer >= regenerationInterval)
@@ -25,11 +46,14 @@ public class AIManagement : MonoBehaviour
     /// </summary>
     private void RegenerateResource()
     {
-        if (currentResources < maxResources)
+        if (currentResources >= maxResources)
         {
-            currentResources++;
-            OnResourcesChanged();
+            return;
         }
+
+        currentResources++;
+        OnResourcesChanged();
+        TryTriggerAIBuild();
     }
 
     /// <summary>
@@ -37,13 +61,33 @@ public class AIManagement : MonoBehaviour
     /// </summary>
     public bool SpendResources(int amount)
     {
+        if (amount <= 0)
+        {
+            return true;
+        }
+
         if (currentResources >= amount)
         {
             currentResources -= amount;
             OnResourcesChanged();
             return true;
         }
+
         return false;
+    }
+
+    /// <summary>
+    /// Refund/add resources (used when a placement attempt fails after spending)
+    /// </summary>
+    public void AddResources(int amount)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        currentResources = Mathf.Clamp(currentResources + amount, 0, maxResources);
+        OnResourcesChanged();
     }
 
     /// <summary>
@@ -78,5 +122,16 @@ public class AIManagement : MonoBehaviour
     {
         currentResources = Mathf.Clamp(amount, 0, maxResources);
         OnResourcesChanged();
+        TryTriggerAIBuild();
+    }
+
+    private void TryTriggerAIBuild()
+    {
+        if (!triggerBuildOnResourceGain || enemyAI == null)
+        {
+            return;
+        }
+
+        enemyAI.TryBuildOneWithResources();
     }
 }

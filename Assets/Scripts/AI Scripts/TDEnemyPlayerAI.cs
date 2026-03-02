@@ -6,12 +6,17 @@ public class TDEnemyPlayerAI : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private TacticalGrid tacticalGrid;
+    [SerializeField] private AIManagement aiManagement;
     [SerializeField] private GameObject archerTowerPrefab;
     [SerializeField] private GameObject wallPrefab;
 
     [Header("Placement Limits")]
     [SerializeField] private int maxArcherTowers = 3;
     [SerializeField] private int maxWalls = 3;
+
+    [Header("Build Costs")]
+    [SerializeField] private int wallCost = 2;
+    [SerializeField] private int archerTowerCost = 3;
 
     [Header("Execution")]
     [SerializeField] private bool runOnStart = false;
@@ -21,13 +26,13 @@ public class TDEnemyPlayerAI : MonoBehaviour
 
     private readonly System.Random rng = new System.Random();
 
-    private const int WALL_WIDTH = 1;
-    private const int WALL_HEIGHT = 3;
+    private const int WALL_WIDTH = 3;
+    private const int WALL_HEIGHT = 1;
     private const int TOWER_WIDTH = 2;
     private const int TOWER_HEIGHT = 2;
 
-    private int wallsPlacedThisTurn;
-    private int towersPlacedThisTurn;
+    private int totalWallsPlaced;
+    private int totalTowersPlaced;
 
     private struct PlacementCandidate
     {
@@ -51,30 +56,61 @@ public class TDEnemyPlayerAI : MonoBehaviour
         {
             tacticalGrid = FindObjectOfType<TacticalGrid>();
         }
+
+        if (aiManagement == null)
+        {
+            aiManagement = FindObjectOfType<AIManagement>();
+        }
     }
 
     private void Start()
     {
         if (runOnStart)
         {
-            DoAITurn();
+            TryBuildOneWithResources();
         }
     }
 
+    // Kept for compatibility with existing calls.
     public void DoAITurn()
+    {
+        bool built = TryBuildOneWithResources();
+        if (!built)
+        {
+            Debug.Log("[EnemyAI] No affordable/valid placement this step.");
+        }
+    }
+
+    /// <summary>
+    /// Attempts to place exactly one structure by spending AI resources.
+    /// Returns true when one placement succeeds.
+    /// </summary>
+    public bool TryBuildOneWithResources()
     {
         if (!ValidateReferences())
         {
-            return;
+            return false;
         }
 
-        wallsPlacedThisTurn = 0;
-        towersPlacedThisTurn = 0;
+        if (totalWallsPlaced >= maxWalls && totalTowersPlaced >= maxArcherTowers)
+        {
+            return false;
+        }
 
-        PlaceWalls();
-        PlaceTowers();
+        bool preferWall = totalWallsPlaced <= totalTowersPlaced;
 
-        Debug.Log($"[EnemyAI] Turn complete. Walls: {wallsPlacedThisTurn}/{maxWalls}, Towers: {towersPlacedThisTurn}/{maxArcherTowers}");
+        if (preferWall)
+        {
+            if (TryBuildWallIfPossible()) return true;
+            if (TryBuildTowerIfPossible()) return true;
+        }
+        else
+        {
+            if (TryBuildTowerIfPossible()) return true;
+            if (TryBuildWallIfPossible()) return true;
+        }
+
+        return false;
     }
 
     private bool ValidateReferences()
@@ -82,6 +118,12 @@ public class TDEnemyPlayerAI : MonoBehaviour
         if (tacticalGrid == null)
         {
             Debug.LogError("[EnemyAI] TacticalGrid not assigned.");
+            return false;
+        }
+
+        if (aiManagement == null)
+        {
+            Debug.LogError("[EnemyAI] AIManagement not assigned.");
             return false;
         }
 
@@ -97,47 +139,84 @@ public class TDEnemyPlayerAI : MonoBehaviour
             return false;
         }
 
+        wallCost = Mathf.Max(1, wallCost);
+        archerTowerCost = Mathf.Max(1, archerTowerCost);
+
         return true;
     }
 
-    private void PlaceWalls()
+    private bool TryBuildWallIfPossible()
     {
-        while (wallsPlacedThisTurn < maxWalls)
+        if (totalWallsPlaced >= maxWalls)
         {
-            var candidates = BuildCandidates(UnitType.Wall, WALL_WIDTH, WALL_HEIGHT, includeWallRotations: true);
-            if (candidates.Count == 0)
-            {
-                break;
-            }
-
-            PlacementCandidate choice = PickBestCandidate(candidates);
-            if (!TryPlace(UnitType.Wall, wallPrefab, choice.col, choice.row, WALL_WIDTH, WALL_HEIGHT, choice.rotation))
-            {
-                break;
-            }
-
-            wallsPlacedThisTurn++;
+            return false;
         }
+
+        if (aiManagement.GetCurrentResources() < wallCost)
+        {
+            return false;
+        }
+
+        List<PlacementCandidate> candidates = BuildCandidates(UnitType.Wall, WALL_WIDTH, WALL_HEIGHT, includeWallRotations: true);
+        if (candidates.Count == 0)
+        {
+            return false;
+        }
+
+        PlacementCandidate choice = PickBestCandidate(candidates);
+
+        if (!aiManagement.SpendResources(wallCost))
+        {
+            return false;
+        }
+
+        bool placed = TryPlace(UnitType.Wall, wallPrefab, choice.col, choice.row, WALL_WIDTH, WALL_HEIGHT, choice.rotation);
+        if (!placed)
+        {
+            aiManagement.AddResources(wallCost);
+            return false;
+        }
+
+        totalWallsPlaced++;
+        Debug.Log($"[EnemyAI] Wall built ({totalWallsPlaced}/{maxWalls}) for cost {wallCost}.");
+        return true;
     }
 
-    private void PlaceTowers()
+    private bool TryBuildTowerIfPossible()
     {
-        while (towersPlacedThisTurn < maxArcherTowers)
+        if (totalTowersPlaced >= maxArcherTowers)
         {
-            var candidates = BuildCandidates(UnitType.ArcherTower, TOWER_WIDTH, TOWER_HEIGHT, includeWallRotations: false);
-            if (candidates.Count == 0)
-            {
-                break;
-            }
-
-            PlacementCandidate choice = PickBestCandidate(candidates);
-            if (!TryPlace(UnitType.ArcherTower, archerTowerPrefab, choice.col, choice.row, TOWER_WIDTH, TOWER_HEIGHT, choice.rotation))
-            {
-                break;
-            }
-
-            towersPlacedThisTurn++;
+            return false;
         }
+
+        if (aiManagement.GetCurrentResources() < archerTowerCost)
+        {
+            return false;
+        }
+
+        List<PlacementCandidate> candidates = BuildCandidates(UnitType.ArcherTower, TOWER_WIDTH, TOWER_HEIGHT, includeWallRotations: false);
+        if (candidates.Count == 0)
+        {
+            return false;
+        }
+
+        PlacementCandidate choice = PickBestCandidate(candidates);
+
+        if (!aiManagement.SpendResources(archerTowerCost))
+        {
+            return false;
+        }
+
+        bool placed = TryPlace(UnitType.ArcherTower, archerTowerPrefab, choice.col, choice.row, TOWER_WIDTH, TOWER_HEIGHT, choice.rotation);
+        if (!placed)
+        {
+            aiManagement.AddResources(archerTowerCost);
+            return false;
+        }
+
+        totalTowersPlaced++;
+        Debug.Log($"[EnemyAI] Archer tower built ({totalTowersPlaced}/{maxArcherTowers}) for cost {archerTowerCost}.");
+        return true;
     }
 
     private List<PlacementCandidate> BuildCandidates(UnitType unitType, int width, int height, bool includeWallRotations)
