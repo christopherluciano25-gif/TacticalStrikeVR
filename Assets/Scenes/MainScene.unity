@@ -1864,6 +1864,55 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 737458276}
   m_Mesh: {fileID: 8733429697405204941, guid: 38b797ba6cc77df40a51cd3200365644, type: 3}
+--- !u!1 &746743450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 746743452}
+  - component: {fileID: 746743451}
+  m_Layer: 0
+  m_Name: AIManagement
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &746743451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746743450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe3ef83d182501f439e44f55396d90d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxResources: 5
+  regenerationInterval: 5
+  startingResources: 0
+  enemyAI: {fileID: 803648839}
+  triggerBuildOnResourceGain: 1
+--- !u!4 &746743452
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746743450}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.7490425, y: 25.408314, z: 146.26968}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &761296320
 GameObject:
   m_ObjectHideFlags: 0
@@ -2001,6 +2050,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 761296320}
   m_CullTransparentMesh: 1
+--- !u!1 &803648838
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 803648840}
+  - component: {fileID: 803648839}
+  m_Layer: 0
+  m_Name: EnemyAI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &803648839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803648838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba952de25ebcb949a88ee5501011557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tacticalGrid: {fileID: 434443815}
+  aiManagement: {fileID: 0}
+  archerTowerPrefab: {fileID: 6169923891604023497, guid: 215808fb70571c044b513387edc14034,
+    type: 3}
+  wallPrefab: {fileID: 4904430799933643664, guid: 036f1ce797094d544ae2b92467f479b8,
+    type: 3}
+  maxArcherTowers: 3
+  maxWalls: 3
+  wallCost: 2
+  archerTowerCost: 3
+  runOnStart: 1
+  usePlayersInvalidArea: 1
+--- !u!4 &803648840
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803648838}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -30.155819, y: 33.4154, z: 70.083885}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &804881190
 GameObject:
   m_ObjectHideFlags: 0
@@ -6488,3 +6593,5 @@ SceneRoots:
   - {fileID: 545024791}
   - {fileID: 826932325}
   - {fileID: 177397305}
+  - {fileID: 803648840}
+  - {fileID: 746743452}
