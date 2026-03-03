@@ -1757,6 +1757,7 @@ GameObject:
   m_Component:
   - component: {fileID: 803648840}
   - component: {fileID: 803648839}
+  - component: {fileID: 803648841}
   m_Layer: 0
   m_Name: EnemyAI
   m_TagString: Untagged
@@ -1777,10 +1778,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tacticalGrid: {fileID: 434443815}
-  aiManagement: {fileID: 0}
-  archerTowerPrefab: {fileID: 6169923891604023497, guid: 215808fb70571c044b513387edc14034,
+  aiManagement: {fileID: 746743451}
+  archerTowerPrefab: {fileID: 3860644921391560158, guid: c256bfd515172044fa91785d9ba8c3d3,
     type: 3}
-  wallPrefab: {fileID: 4904430799933643664, guid: 036f1ce797094d544ae2b92467f479b8,
+  wallPrefab: {fileID: 4860641829804342151, guid: 6ba8befd0b23c6a4fbaa306c4052ae9c,
     type: 3}
   maxArcherTowers: 3
   maxWalls: 3
@@ -1803,6 +1804,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &803648841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803648838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e517657311b94945b38693b8e97128d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tacticalGrid: {fileID: 434443815}
+  aiManagement: {fileID: 746743451}
+  troopPrefab: {fileID: 5302561952942502940, guid: bc35bca85c8b488499dc273c2e7cf93f,
+    type: 3}
+  troopUnitType: 2
+  troopWidth: 1
+  troopHeight: 1
+  troopCost: 2
+  maxTroopsToPlace: 30
+  decisionInterval: 1.5
+  threatDistanceFromFrontline: 3
+  interceptThreatThreshold: 4
+  topCandidatesToRandomPick: 3
 --- !u!1 &804881190
 GameObject:
   m_ObjectHideFlags: 0

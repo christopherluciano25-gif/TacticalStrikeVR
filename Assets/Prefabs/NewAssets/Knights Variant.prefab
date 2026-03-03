@@ -96,5 +96,5 @@ MonoBehaviour:
   attackRange: 1.5
   attackCooldown: 1
   baseDamage: 20
-  team: 1
+  team: 2
   grid: {fileID: 0}
